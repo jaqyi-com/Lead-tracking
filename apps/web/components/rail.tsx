@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
 import { api } from "@/lib/api";
+import { POLL_MS } from "@/lib/realtime";
 import { ago, dateTime, money } from "@/lib/format";
 import { ScoreBadge, SourceLabel, StageBadge } from "./ui";
 
@@ -48,7 +49,7 @@ export type LeadDetail = {
 };
 
 export function useLead(leadId: string) {
-  return useQuery({ queryKey: ["lead", leadId], queryFn: () => api<LeadDetail>(`/api/leads/${leadId}`) });
+  return useQuery({ queryKey: ["lead", leadId], queryFn: () => api<LeadDetail>(`/api/leads/${leadId}`), refetchInterval: POLL_MS.lead });
 }
 
 export const ACTIVITY_LABEL: Record<string, string> = {

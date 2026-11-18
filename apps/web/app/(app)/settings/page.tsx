@@ -51,6 +51,9 @@ function SettingsInner() {
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-2xl space-y-4 p-4">
         <h1 className="text-xl font-semibold">Settings</h1>
+        {params.get("totp") === "required" && !me.data.totpEnabled && (
+          <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">Admins must turn on two-factor authentication before using the app. Set it up below.</p>
+        )}
         {params.get("gmail") === "connected" && <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-800">Gmail connected. New mail to your address will appear in the inbox.</p>}
 
         <section className="card p-4">

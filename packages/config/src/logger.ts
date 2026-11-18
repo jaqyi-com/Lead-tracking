@@ -8,7 +8,7 @@ export const logger = pino({
     censor: "[redacted]",
   },
   transport:
-    env.NODE_ENV === "development"
+    env.NODE_ENV === "development" && !process.env.VERCEL && !process.env.LOG_JSON
       ? { target: "pino-pretty", options: { colorize: true, translateTime: "HH:MM:ss" } }
       : undefined,
 });

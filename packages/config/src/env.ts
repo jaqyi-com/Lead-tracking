@@ -101,7 +101,8 @@ export const env: Env = parsed.data;
 export const repoRoot = envFile ? dirname(envFile) : process.cwd();
 
 if (env.NODE_ENV === "production") {
-  const required: (keyof Env)[] = ["APP_SECRET", "DATABASE_URL", "REDIS_URL"];
+  // Serverless (Vercel) mode needs no Redis: jobs run via waitUntil and sweepers.
+  const required: (keyof Env)[] = process.env.VERCEL ? ["APP_SECRET", "DATABASE_URL"] : ["APP_SECRET", "DATABASE_URL", "REDIS_URL"];
   if (env.MESSAGING_PROVIDER === "cloud") required.push("WA_APP_SECRET", "WA_ACCESS_TOKEN", "WA_PHONE_NUMBER_ID");
   for (const key of required) {
     if (!process.env[key]) throw new Error(`Missing required env ${key} in production`);

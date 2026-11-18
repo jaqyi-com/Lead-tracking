@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
 import { api } from "@/lib/api";
 import { useHotkeys, useNow } from "@/lib/hooks";
+import { POLL_MS } from "@/lib/realtime";
 import { ago, countdown } from "@/lib/format";
 import { ChannelIcon, Empty, SlaDot, StageBadge } from "@/components/ui";
 import { Thread } from "@/components/thread";
@@ -57,7 +58,7 @@ function InboxInner() {
   const q = useQuery({
     queryKey: ["conversations", filter, channel],
     queryFn: () => api<{ items: ConvRow[]; counts: Record<string, number> }>(`/api/conversations?filter=${filter}${channel ? `&channel=${channel}` : ""}`),
-    refetchInterval: 30_000,
+    refetchInterval: POLL_MS.list,
   });
   const items = useMemo(() => q.data?.items ?? [], [q.data]);
 

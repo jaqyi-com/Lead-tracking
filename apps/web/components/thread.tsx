@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { api, ApiError, post } from "@/lib/api";
 import { useHotkeys, useMe, isManager } from "@/lib/hooks";
-import { useRealtime } from "@/lib/realtime";
+import { POLL_MS, useRealtime } from "@/lib/realtime";
 import { ago, dateTime } from "@/lib/format";
 import { ChannelIcon, StageBadge } from "./ui";
 import { Composer, type ComposerHandle } from "./composer";
@@ -57,6 +57,7 @@ export function Thread({ conversationId, onBack, onNext }: { conversationId: str
         messages: Msg[];
         notes: Note[];
       }>(`/api/conversations/${conversationId}`),
+    refetchInterval: POLL_MS.thread,
   });
 
   const leadId = q.data?.lead.id;

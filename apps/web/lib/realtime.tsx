@@ -3,6 +3,10 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { io, type Socket } from "socket.io-client";
 import { useQueryClient } from "@tanstack/react-query";
 
+export const REALTIME_ON = process.env.NEXT_PUBLIC_REALTIME !== "off";
+/** Refetch intervals: relaxed with realtime, tighter when polling is the only update path. */
+export const POLL_MS = { list: REALTIME_ON ? 30_000 : 8_000, thread: REALTIME_ON ? false : (5_000 as number | false), lead: REALTIME_ON ? false : (15_000 as number | false) };
+
 type Ev = { type: string; leadId?: string; conversationId?: string; messageId?: string; data?: Record<string, unknown> };
 type Viewer = { userId: string; name: string; typing: boolean };
 
@@ -16,6 +20,8 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // Serverless backends (Vercel) have no Socket.IO server; the app polls instead (see POLL_MS).
+    if (!REALTIME_ON) return;
     const url = process.env.NEXT_PUBLIC_WS_URL || undefined;
     const s = io(url ?? "", { path: "/ws", withCredentials: true, transports: ["polling", "websocket"] });
     setSocket(s);

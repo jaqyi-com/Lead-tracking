@@ -27,3 +27,4 @@ export * from "./providers/messaging";
 export * from "./providers/email";
 export * from "./providers/gmail";
 export * from "./providers/storage";
+export * from "./serverless";

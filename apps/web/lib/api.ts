@@ -24,6 +24,10 @@ export async function api<T = any>(path: string, init: RequestInit & { json?: un
   const data = text ? safeJson(text) : null;
   if (!res.ok) {
     const d = (data ?? {}) as { error?: string; message?: string; details?: unknown };
+    // Production requires admins to enable 2FA before anything else works.
+    if (d.error === "totp_setup_required" && typeof window !== "undefined" && !window.location.pathname.startsWith("/settings")) {
+      window.location.href = "/settings?totp=required";
+    }
     throw new ApiError(res.status, d.error ?? "error", d.message ?? `Request failed (${res.status})`, d.details);
   }
   return data as T;
