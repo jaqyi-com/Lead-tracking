@@ -1,0 +1,43 @@
+# Production on two small VPS (§4.4). Managed Postgres (PITR on) + managed Redis via .env.
+# Box A (app):    caddy, ingest, api, web       →  docker compose --profile app up -d
+# Box B (worker): worker                        →  docker compose --profile worker up -d
+x-app: &app
+  image: ${IMAGE:-ghcr.io/doott/lead-os:latest}
+  env_file: .env
+  restart: unless-stopped
+  logging: { driver: json-file, options: { max-size: "20m", max-file: "5" } }
+
+services:
+  migrate:
+    <<: *app
+    profiles: ["app"]
+    environment: { ROLE: migrate }
+    restart: "no"
+  ingest:
+    <<: *app
+    profiles: ["app"]
+    environment: { ROLE: ingest }
+    deploy: { replicas: 2 }
+    healthcheck: { test: ["CMD", "node", "-e", "fetch('http://localhost:4100/healthz').then(r=>process.exit(r.ok?0:1))"], interval: 15s }
+  api:
+    <<: *app
+    profiles: ["app"]
+    environment: { ROLE: api }
+    depends_on: { migrate: { condition: service_completed_successfully } }
+  web:
+    <<: *app
+    profiles: ["app"]
+    environment: { ROLE: web, API_URL: "http://api:4000" }
+  worker:
+    <<: *app
+    profiles: ["worker"]
+    environment: { ROLE: worker }
+  caddy:
+    image: caddy:2.8
+    profiles: ["app"]
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes: ["./Caddyfile:/etc/caddy/Caddyfile:ro", "caddy_data:/data"]
+
+volumes:
+  caddy_data:

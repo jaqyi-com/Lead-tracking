@@ -1,0 +1,21 @@
+# leads.doott.com → web + api on one origin (cookies, no CORS); hooks.doott.com → ingest only.
+leads.doott.com {
+	encode zstd gzip
+	@api path /api/* /files/* /ws/*
+	reverse_proxy @api api:4000
+	reverse_proxy web:3000
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+	}
+}
+
+# Webhooks get their own hostname so a web/api incident never touches Meta/Postmark delivery.
+hooks.doott.com {
+	reverse_proxy ingest:4100 {
+		lb_policy round_robin
+		health_uri /healthz
+	}
+}

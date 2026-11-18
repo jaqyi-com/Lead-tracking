@@ -1,0 +1,3 @@
+{ "from": "wordpress@doott.com", "subject": "New submission from Contact Us",
+  "text": "Name: Farah Khan\nEmail: farah@khanretail.co.in\nPhone: +91 90000 11122\nCompany: Khan Retail\nMessage: Looking for retail store owner contacts in Delhi NCR.",
+  "expect": { "source": "website_form", "name": "Farah Khan", "phone": "+919000011122", "email": "farah@khanretail.co.in", "company": "Khan Retail" } }

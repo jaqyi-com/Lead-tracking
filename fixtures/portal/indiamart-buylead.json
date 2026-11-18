@@ -1,0 +1,3 @@
+{ "from": "buyleads@indiamart.com", "subject": "Enquiry for Email Database from Kiran Desai, Surat",
+  "text": "Dear Supplier,\n\nYou have received a Buyer's Enquiry.\n\nEnquiry ID: 2398817731\nName: Kiran Desai\nMobile: +91-99099 12345\nEmail: kiran@desaitextiles.com\nCompany: Desai Textiles Pvt Ltd\nCity: Surat, Gujarat\nProduct: Email Database\nQuantity: 25000 records\nMessage: Need textile manufacturer contacts in Gujarat with mobile numbers.\n\nRegards,\nIndiaMART",
+  "expect": { "source": "indiamart", "portalLeadId": "2398817731", "name": "Kiran Desai", "phone": "+919909912345", "email": "kiran@desaitextiles.com", "company": "Desai Textiles Pvt Ltd", "city": "Surat", "state": "Gujarat" } }

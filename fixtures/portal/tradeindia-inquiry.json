@@ -1,0 +1,3 @@
+{ "from": "inquiry@tradeindia.com", "subject": "New Inquiry from TradeIndia for B2B Data",
+  "text": "Inquiry No: TI-55102\nContact Person: Meghna Iyer\nCompany Name: Iyer Logistics\nPhone: 09845012345\nEmail ID: meghna@iyerlogistics.in\nCity: Bengaluru\nRequirement Details: Logistics company decision makers in South India",
+  "expect": { "source": "tradeindia", "portalLeadId": "TI-55102", "name": "Meghna Iyer", "phone": "+919845012345", "email": "meghna@iyerlogistics.in", "company": "Iyer Logistics" } }

@@ -1,0 +1,28 @@
+{
+  "name": "@lead/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fastify/cookie": "11.0.2",
+    "@fastify/cors": "11.0.1",
+    "@fastify/multipart": "9.0.3",
+    "@fastify/rate-limit": "10.3.0",
+    "@lead/config": "workspace:*",
+    "@lead/core": "workspace:*",
+    "@lead/db": "workspace:*",
+    "@lead/domain": "workspace:*",
+    "@socket.io/redis-adapter": "8.3.0",
+    "drizzle-orm": "0.44.2",
+    "fastify": "5.4.0",
+    "ioredis": "5.6.1",
+    "otplib": "12.0.1",
+    "socket.io": "4.8.1",
+    "zod": "3.25.67"
+  }
+}

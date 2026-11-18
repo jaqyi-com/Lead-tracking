@@ -1,0 +1,39 @@
+{
+  "name": "doott-lead-os",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter ./apps/* dev",
+    "dev:ingest": "pnpm --filter @lead/ingest dev",
+    "dev:api": "pnpm --filter @lead/api dev",
+    "dev:worker": "pnpm --filter @lead/worker dev",
+    "dev:web": "pnpm --filter @lead/web dev",
+    "db:generate": "pnpm --filter @lead/db generate",
+    "db:migrate": "pnpm --filter @lead/db migrate",
+    "db:seed": "pnpm --filter @lead/db seed",
+    "devdb:start": "bash infra/dev-db.sh start",
+    "devdb:stop": "bash infra/dev-db.sh stop",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "simulate": "tsx scripts/simulate.ts",
+    "reconcile": "tsx scripts/reconcile.ts"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.32",
+    "tsx": "4.20.3",
+    "typescript": "5.8.3",
+    "vitest": "3.2.4"
+  },
+  "dependencies": {
+    "@lead/config": "workspace:*",
+    "@lead/db": "workspace:*",
+    "@lead/domain": "workspace:*",
+    "@lead/core": "workspace:*"
+  }
+}

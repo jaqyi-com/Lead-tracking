@@ -1,0 +1,3 @@
+{ "from": "buyleads@indiamart.com", "subject": "IndiaMART: you have a new BuyLead",
+  "text": "A buyer is interested in your product. Log in to IndiaMART Lead Manager to view contact details.",
+  "expectFailure": true }
