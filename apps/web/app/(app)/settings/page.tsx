@@ -50,22 +50,22 @@ function SettingsInner() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-2xl space-y-4 p-4">
-        <h1 className="text-xl font-semibold">Settings</h1>
+        <h1 className="page-title">Settings</h1>
         {params.get("totp") === "required" && !me.data.totpEnabled && (
           <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">Admins must turn on two-factor authentication before using the app. Set it up below.</p>
         )}
         {params.get("gmail") === "connected" && <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-800">Gmail connected. New mail to your address will appear in the inbox.</p>}
 
         <section className="card p-4">
-          <h2 className="font-semibold">{me.data.name}</h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="section-title">{me.data.name}</h2>
+          <p className="text-sm text-ink-500">
             {me.data.email} · {me.data.role}
           </p>
         </section>
 
         <section className="card space-y-2 p-4">
-          <h2 className="font-semibold">Gmail mailbox</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-300">Connect your work Gmail so clients who email you directly land in the inbox, and your replies go out from your own address (and appear in your Sent folder).</p>
+          <h2 className="section-title">Gmail mailbox</h2>
+          <p className="text-sm text-ink-600 dark:text-ink-300">Connect your work Gmail so clients who email you directly land in the inbox, and your replies go out from your own address (and appear in your Sent folder).</p>
           {me.data.mailbox && me.data.mailbox.status === "active" ? (
             <div className="flex items-center gap-2 text-sm">
               Connected: <b>{me.data.mailbox.email}</b>
@@ -81,20 +81,20 @@ function SettingsInner() {
         </section>
 
         <section className="card space-y-2 p-4">
-          <h2 className="font-semibold">Push notifications</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-300">Get new-lead and reply alerts on this device (works on Android and installed iOS web apps).</p>
+          <h2 className="section-title">Push notifications</h2>
+          <p className="text-sm text-ink-600 dark:text-ink-300">Get new-lead and reply alerts on this device (works on Android and installed iOS web apps).</p>
           <button className="btn" onClick={enablePush}>
             Enable on this device
           </button>
         </section>
 
         <section className="card space-y-2 p-4">
-          <h2 className="font-semibold">Two-factor authentication</h2>
+          <h2 className="section-title">Two-factor authentication</h2>
           {me.data.totpEnabled ? (
             <p className="text-sm text-emerald-700">Enabled.</p>
           ) : (
             <>
-              <p className="text-sm text-slate-600 dark:text-slate-300">Required for admins, recommended for everyone.</p>
+              <p className="text-sm text-ink-600 dark:text-ink-300">Required for admins, recommended for everyone.</p>
               {!totp ? (
                 <button className="btn" onClick={() => setup.mutate()}>
                   Set up authenticator app
@@ -102,7 +102,7 @@ function SettingsInner() {
               ) : (
                 <div className="space-y-2 text-sm">
                   <p>Add this key in Google Authenticator / 1Password / Authy, then enter the 6-digit code:</p>
-                  <code className="block break-all rounded bg-slate-100 p-2 dark:bg-slate-800">{totp.secret}</code>
+                  <code className="block break-all rounded bg-ink-100 p-2 dark:bg-ink-800">{totp.secret}</code>
                   <a className="text-xs text-brand-600 underline" href={totp.otpauth}>
                     Open in authenticator app
                   </a>

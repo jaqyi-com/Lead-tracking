@@ -25,16 +25,16 @@ function AdminInner() {
   if (me.data && me.data.role !== "admin" && me.data.role !== "manager") return <p className="p-6 text-sm">Managers and admins only.</p>;
   return (
     <div className="flex h-full">
-      <nav className="w-48 shrink-0 space-y-0.5 overflow-y-auto border-r border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900">
+      <nav className="w-48 shrink-0 space-y-0.5 overflow-y-auto border-r border-ink-200 bg-white p-2 dark:border-ink-800 dark:bg-ink-900">
         {TABS.map((t) => (
-          <button key={t} onClick={() => router.replace(`/admin?tab=${encodeURIComponent(t)}`)} className={clsx("block w-full rounded-md px-3 py-1.5 text-left text-sm", tab === t ? "bg-slate-100 font-medium dark:bg-slate-800" : "hover:bg-slate-50 dark:hover:bg-slate-800/50")}>
+          <button key={t} onClick={() => router.replace(`/admin?tab=${encodeURIComponent(t)}`)} className={clsx("block w-full rounded-md px-3 py-1.5 text-left text-sm", tab === t ? "bg-ink-100 font-medium dark:bg-ink-800" : "hover:bg-ink-50 dark:hover:bg-ink-800/50")}>
             {t}
           </button>
         ))}
       </nav>
       <div className="min-w-0 flex-1 overflow-y-auto p-4">
         <div className="mx-auto max-w-5xl">
-          <h1 className="mb-4 text-xl font-semibold">{tab}</h1>
+          <h1 className="page-title mb-5">{tab}</h1>
           {tab === "Team" && <TeamTab />}
           {tab === "Routing" && <RoutingTab />}
           {tab === "Hours & SLA" && <HoursTab />}
@@ -91,15 +91,15 @@ function TeamTab() {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-ink-100 dark:divide-ink-800">
             {q.data?.items.map((u) => (
               <tr key={u.id}>
                 <td className="td">
                   <div className="font-medium">{u.name}</div>
-                  <div className="text-xs text-slate-500">{u.email}</div>
+                  <div className="text-xs text-ink-500">{u.email}</div>
                 </td>
                 <td className="td">
-                  <select className="input h-8 w-auto" disabled={!isAdmin} value={u.role} onChange={(e) => save.mutate({ id: u.id, body: { role: e.target.value } })}>
+                  <select className="input h-9 py-1 w-auto" disabled={!isAdmin} value={u.role} onChange={(e) => save.mutate({ id: u.id, body: { role: e.target.value } })}>
                     {["admin", "manager", "rep", "viewer", "service"].map((r) => (
                       <option key={r}>{r}</option>
                     ))}
@@ -170,19 +170,19 @@ function RoutingTab() {
   const parseCsv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
   return (
     <div className="space-y-4">
-      <p className="text-sm text-slate-600 dark:text-slate-300">Sticky owner always wins first. Then rules run top-down by priority; the first match assigns. Leads nobody can take sit in Unassigned and the after-hours acknowledgement goes out.</p>
+      <p className="text-sm text-ink-600 dark:text-ink-300">Sticky owner always wins first. Then rules run top-down by priority; the first match assigns. Leads nobody can take sit in Unassigned and the after-hours acknowledgement goes out.</p>
       <button className="btn-primary" onClick={() => setEdit({ name: "", priority: 100, strategy: "round_robin", fallback: "next_rule", active: true, conditions: {} })}>
         + Add rule
       </button>
-      <div className="card divide-y divide-slate-100 dark:divide-slate-800">
+      <div className="card divide-y divide-ink-100 dark:divide-ink-800">
         {q.data?.items.map((r) => (
           <div key={r.id} className="flex items-center gap-3 p-3 text-sm">
             <span className="kbd">{r.priority}</span>
             <div className="min-w-0 flex-1">
               <div className="font-medium">
-                {r.name} {!r.active && <span className="chip bg-slate-200">off</span>}
+                {r.name} {!r.active && <span className="chip bg-ink-200">off</span>}
               </div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-ink-500">
                 {Object.entries(r.conditions).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join("/") : v}`).join(" · ") || "matches everything"} → {r.strategy.replace(/_/g, " ")}
                 {r.targetUserId && ` (${meta.data?.users.find((u) => u.id === r.targetUserId)?.name ?? "user"})`} · fallback {r.fallback.replace(/_/g, " ")}
               </div>
@@ -289,14 +289,14 @@ function HoursTab() {
   const addHol = useMutation({ mutationFn: () => post("/api/admin/holidays", hol), onSuccess: () => (setHol({ day: "", name: "" }), qc.invalidateQueries({ queryKey: ["hours"] })), onError: onErr });
   const delHol = useMutation({ mutationFn: (id: string) => del(`/api/admin/holidays/${id}`), onSuccess: () => qc.invalidateQueries({ queryKey: ["hours"] }) });
   const saveSla = useMutation({ mutationFn: ({ id, targetMinutes }: { id: string; targetMinutes: number }) => patch(`/api/admin/sla-policies/${id}`, { targetMinutes }), onSuccess: () => (toast("SLA saved"), qc.invalidateQueries({ queryKey: ["sla"] })), onError: onErr });
-  if (!bh) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!bh) return <p className="text-sm text-ink-500">Loading…</p>;
   return (
     <div className="space-y-4">
       <section className="card p-4">
         <div className="mb-2 flex items-center justify-between">
           <div>
             <div className="font-semibold">{bh.name}</div>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-ink-500">
               {bh.description} · {bh.openNow ? "open now" : "closed now"}
             </div>
           </div>
@@ -308,7 +308,7 @@ function HoursTab() {
           {DAYS.map((d, i) => {
             const slot = w[String(i)]?.[0];
             return (
-              <div key={d} className="rounded-md border border-slate-200 p-2 text-xs dark:border-slate-700">
+              <div key={d} className="rounded-md border border-ink-200 p-2 text-xs dark:border-ink-700">
                 <label className="flex items-center gap-1 font-medium">
                   <input type="checkbox" checked={!!slot} onChange={(e) => setWeekly({ ...w, [String(i)]: e.target.checked ? [["09:30", "18:30"]] : [] })} /> {d}
                 </label>
@@ -334,7 +334,7 @@ function HoursTab() {
         </div>
         <ul className="grid gap-1 text-sm sm:grid-cols-2">
           {hours.data?.holidays.map((h) => (
-            <li key={h.id} className="flex justify-between rounded bg-slate-50 px-2 py-1 dark:bg-slate-800">
+            <li key={h.id} className="flex justify-between rounded bg-ink-50 px-2 py-1 dark:bg-ink-800">
               <span>
                 {h.day} — {h.name}
               </span>
@@ -348,13 +348,13 @@ function HoursTab() {
       <section className="card p-4">
         <div className="mb-2 font-semibold">SLA targets (business minutes; warn at 50%, breach at 100%, auto-reassign at 200%)</div>
         <table className="min-w-full">
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-ink-100 dark:divide-ink-800">
             {sla.data?.items.map((p) => (
               <tr key={p.id}>
                 <td className="td capitalize">{p.kind.replace(/_/g, " ")}</td>
-                <td className="td capitalize text-slate-500">{p.stage}</td>
+                <td className="td capitalize text-ink-500">{p.stage}</td>
                 <td className="td">
-                  <input className="input h-8 w-24" type="number" defaultValue={p.targetMinutes} onBlur={(e) => Number(e.target.value) !== p.targetMinutes && saveSla.mutate({ id: p.id, targetMinutes: Number(e.target.value) })} /> min
+                  <input className="input h-9 py-1 w-24" type="number" defaultValue={p.targetMinutes} onBlur={(e) => Number(e.target.value) !== p.targetMinutes && saveSla.mutate({ id: p.id, targetMinutes: Number(e.target.value) })} /> min
                 </td>
               </tr>
             ))}
@@ -389,16 +389,16 @@ function TemplatesTab() {
           Sync from Meta
         </button>
       </div>
-      <p className="text-xs text-slate-500">Keep variables few, never make the whole message one variable, and categorise honestly — marketing sent as utility is a policy and billing violation.</p>
-      <div className="card divide-y divide-slate-100 dark:divide-slate-800">
+      <p className="text-xs text-ink-500">Keep variables few, never make the whole message one variable, and categorise honestly — marketing sent as utility is a policy and billing violation.</p>
+      <div className="card divide-y divide-ink-100 dark:divide-ink-800">
         {q.data?.items.map((t) => (
           <div key={t.id} className="flex items-start gap-3 p-3 text-sm">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 font-medium">
-                {t.internalName} <span className="chip bg-slate-100 dark:bg-slate-800">{t.category}</span> <span className="chip bg-slate-100 dark:bg-slate-800">{t.language}</span> <span className={clsx("chip", statusCls(t.approvalStatus))}>{t.approvalStatus}</span>
-                <span className="text-xs text-slate-400">used {t.usageCount}×</span>
+                {t.internalName} <span className="chip bg-ink-100 dark:bg-ink-800">{t.category}</span> <span className="chip bg-ink-100 dark:bg-ink-800">{t.language}</span> <span className={clsx("chip", statusCls(t.approvalStatus))}>{t.approvalStatus}</span>
+                <span className="text-xs text-ink-400">used {t.usageCount}×</span>
               </div>
-              <div className="mt-1 whitespace-pre-wrap text-xs text-slate-600 dark:text-slate-300">{t.body}</div>
+              <div className="mt-1 whitespace-pre-wrap text-xs text-ink-600 dark:text-ink-300">{t.body}</div>
               {t.rejectionReason && <div className="mt-1 text-xs text-red-600">Rejected: {t.rejectionReason}</div>}
             </div>
             <button className="btn" onClick={() => setEdit(t)}>
@@ -431,7 +431,7 @@ function TemplatesTab() {
               )}
             </div>
             <textarea className="input font-mono" rows={4} value={edit.body} onChange={(e) => setEdit({ ...edit, body: e.target.value })} placeholder="Hi {{1}}, …" />
-            <div className="text-xs text-slate-500">Variables — source: contact.first_name, owner.first_name, company.name, lead.number, org.working_hours, or manual.</div>
+            <div className="text-xs text-ink-500">Variables — source: contact.first_name, owner.first_name, company.name, lead.number, org.working_hours, or manual.</div>
             {[...new Set([...(edit.body as string).matchAll(/\{\{(\d+)\}\}/g)].map((m) => m[1]!))].map((key) => {
               const v = edit.variables.find((x: any) => x.key === key) ?? { key };
               const setV = (patchV: any) => setEdit({ ...edit, variables: [...edit.variables.filter((x: any) => x.key !== key), { ...v, ...patchV }].sort((a: any, b: any) => Number(a.key) - Number(b.key)) });
@@ -463,27 +463,27 @@ function SequencesTab() {
   const fmt = (m: number) => (m >= 1440 ? `Day ${Math.round(m / 1440)}` : `+${Math.round(m / 60)}h`);
   return (
     <div className="space-y-4">
-      <p className="text-sm text-slate-600 dark:text-slate-300">
+      <p className="text-sm text-ink-600 dark:text-ink-300">
         Enrollment starts at Attempting and stops on any client reply, a stage past Engaged, or close. WhatsApp steps use the free-form text when the window is open, the approved template when it's closed, and fall back to email if neither works. Quiet hours 09:00–20:00 contact time; one channel per day.
       </p>
       {q.data?.items.map((s) => (
         <div key={s.id} className="card">
-          <div className="border-b border-slate-200 p-3 font-semibold dark:border-slate-800">
+          <div className="border-b border-ink-200 p-3 font-semibold dark:border-ink-800">
             {s.name} {s.isDefault && <span className="chip bg-brand-100 text-brand-700">default</span>}
           </div>
-          <div className="divide-y divide-slate-100 dark:divide-slate-800">
+          <div className="divide-y divide-ink-100 dark:divide-ink-800">
             {s.steps.map((st: any) => (
               <div key={st.id} className="grid gap-2 p-3 text-sm md:grid-cols-[6rem_8rem_1fr]">
                 <div>
                   <div className="font-medium">Step {st.position}</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-ink-500">
                     {fmt(st.offsetMinutes)} {st.offsetBusiness && "(business)"}
                   </div>
                 </div>
                 <div className="text-xs">
                   <div className="font-medium">{st.action.replace(/_/g, " ")}</div>
-                  <div className="text-slate-500">{st.channel.replace(/_/g, " ")}</div>
-                  {st.templateInternalName && <div className="text-slate-500">template: {st.templateInternalName}</div>}
+                  <div className="text-ink-500">{st.channel.replace(/_/g, " ")}</div>
+                  {st.templateInternalName && <div className="text-ink-500">template: {st.templateInternalName}</div>}
                 </div>
                 <div className="space-y-1">
                   {st.action === "task" && <input className="input" defaultValue={st.taskTitle ?? ""} onBlur={(e) => save.mutate({ id: st.id, body: { taskTitle: e.target.value } })} />}
@@ -494,7 +494,7 @@ function SequencesTab() {
                       {st.channel !== "email" && <textarea className="input" rows={2} placeholder="WhatsApp free-form (used only while the window is open)" defaultValue={st.waBody ?? ""} onBlur={(e) => save.mutate({ id: st.id, body: { waBody: e.target.value || null } })} />}
                     </>
                   )}
-                  {st.action === "move_to_nurture" && <div className="text-xs text-slate-500">Moves to Nurture with a {st.revisitDays}-day revisit task.</div>}
+                  {st.action === "move_to_nurture" && <div className="text-xs text-ink-500">Moves to Nurture with a {st.revisitDays}-day revisit task.</div>}
                 </div>
               </div>
             ))}
@@ -545,17 +545,17 @@ function BroadcastsTab() {
             ))}
         </select>
         <div className="flex flex-wrap gap-1 text-xs">
-          <span className="text-slate-500">Stages:</span>
+          <span className="text-ink-500">Stages:</span>
           {meta.data?.stages.map((s) => (
-            <button key={s} className={clsx("chip border", f.stages.includes(s) ? "border-brand-600 bg-brand-100" : "border-slate-300")} onClick={() => setF({ ...f, stages: toggle(f.stages, s) })}>
+            <button key={s} className={clsx("chip border", f.stages.includes(s) ? "border-brand-600 bg-brand-100" : "border-ink-300")} onClick={() => setF({ ...f, stages: toggle(f.stages, s) })}>
               {s}
             </button>
           ))}
         </div>
         <div className="flex flex-wrap gap-1 text-xs">
-          <span className="text-slate-500">Sources:</span>
+          <span className="text-ink-500">Sources:</span>
           {(meta.data?.sources as any[] | undefined)?.map((s) => (
-            <button key={s.key} className={clsx("chip border", f.sources.includes(s.key) ? "border-brand-600 bg-brand-100" : "border-slate-300")} onClick={() => setF({ ...f, sources: toggle(f.sources, s.key) })}>
+            <button key={s.key} className={clsx("chip border", f.sources.includes(s.key) ? "border-brand-600 bg-brand-100" : "border-ink-300")} onClick={() => setF({ ...f, sources: toggle(f.sources, s.key) })}>
               {s.label}
             </button>
           ))}
@@ -569,25 +569,25 @@ function BroadcastsTab() {
           </button>
         </div>
         {preview && (
-          <div className="rounded-md bg-slate-50 p-3 text-sm dark:bg-slate-800">
+          <div className="rounded-md bg-ink-50 p-3 text-sm dark:bg-ink-800">
             <div>
               Segment: <b>{preview.segmentSize}</b> · eligible after consent checks: <b>{preview.eligible}</b> · estimated cost <b>{money(preview.estimatedCost)}</b> (₹{preview.ratePerMessage}/msg)
             </div>
-            {Object.keys(preview.excluded).length > 0 && <div className="text-xs text-slate-500">Excluded: {Object.entries(preview.excluded).map(([k, v]) => `${k.replace(/_/g, " ")} ${v}`).join(" · ")}</div>}
-            <div className="mt-2 whitespace-pre-wrap rounded bg-white p-2 text-xs dark:bg-slate-900">{preview.template.body}</div>
+            {Object.keys(preview.excluded).length > 0 && <div className="text-xs text-ink-500">Excluded: {Object.entries(preview.excluded).map(([k, v]) => `${k.replace(/_/g, " ")} ${v}`).join(" · ")}</div>}
+            <div className="mt-2 whitespace-pre-wrap rounded bg-white p-2 text-xs dark:bg-ink-900">{preview.template.body}</div>
           </div>
         )}
       </section>
-      <div className="card divide-y divide-slate-100 dark:divide-slate-800">
+      <div className="card divide-y divide-ink-100 dark:divide-ink-800">
         {list.data?.items.map((b) => (
           <div key={b.id} className="flex items-center gap-3 p-3 text-sm">
             <div className="flex-1">
               <div className="font-medium">{b.name}</div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-ink-500">
                 {b.recipientCount} recipients · {money(b.estimatedCost)} · {dateTime(b.createdAt)}
               </div>
             </div>
-            <span className="chip bg-slate-100 dark:bg-slate-800">{b.status.replace(/_/g, " ")}</span>
+            <span className="chip bg-ink-100 dark:bg-ink-800">{b.status.replace(/_/g, " ")}</span>
             {b.status === "pending_approval" && (
               <button className="btn" onClick={() => setConfirm({ id: b.id, count: b.recipientCount })}>
                 Approve…
@@ -620,7 +620,7 @@ function ImportTab() {
   const run = useMutation({ mutationFn: (dryRun: boolean) => post("/api/admin/import", { csv, dryRun }), onSuccess: setReport, onError: onErr });
   return (
     <div className="space-y-3">
-      <p className="text-sm text-slate-600 dark:text-slate-300">
+      <p className="text-sm text-ink-600 dark:text-ink-300">
         Columns: <code>name, email, phone, company, job_title, city, source, stage, owner_email, value, notes, next_step, next_step_date</code>. Contacts are matched on phone/email; imported leads don't trigger acknowledgements or cadences.
       </p>
       <input
@@ -664,13 +664,13 @@ function QueueTab() {
   const q = useQuery({ queryKey: ["queue"], queryFn: () => api<any>("/api/admin/queue-health"), refetchInterval: 15_000 });
   const replay = useMutation({ mutationFn: (id: string) => post(`/api/admin/webhook-events/${id}/replay`), onSuccess: () => (toast("Replay queued"), qc.invalidateQueries({ queryKey: ["queue"] })) });
   const d = q.data;
-  if (!d) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!d) return <p className="text-sm text-ink-500">Loading…</p>;
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <div className="card p-3 text-sm">
           Unprocessed webhooks <div className="text-2xl font-semibold">{d.webhooks.unprocessed}</div>
-          {d.webhooks.oldest_unprocessed && <div className="text-xs text-slate-500">oldest {ago(d.webhooks.oldest_unprocessed)}</div>}
+          {d.webhooks.oldest_unprocessed && <div className="text-xs text-ink-500">oldest {ago(d.webhooks.oldest_unprocessed)}</div>}
         </div>
         <div className="card p-3 text-sm">
           Failing <div className={clsx("text-2xl font-semibold", d.webhooks.failing && "text-red-600")}>{d.webhooks.failing}</div>
@@ -684,7 +684,7 @@ function QueueTab() {
       </div>
       <section className="card p-3 text-sm">
         <div className="mb-1 font-semibold">Gmail mailboxes</div>
-        {d.mailboxes.length === 0 && <p className="text-xs text-slate-500">None connected. Reps connect from Settings.</p>}
+        {d.mailboxes.length === 0 && <p className="text-xs text-ink-500">None connected. Reps connect from Settings.</p>}
         {d.mailboxes.map((m: any) => (
           <div key={m.email} className="text-xs">
             {m.email} — {m.status} · watch expires {ago(m.watchExpiresAt)} {m.lastError && <span className="text-red-600">· {m.lastError}</span>}
@@ -692,10 +692,10 @@ function QueueTab() {
         ))}
       </section>
       <section className="card">
-        <div className="border-b border-slate-200 p-3 text-sm font-semibold dark:border-slate-800">Webhook events with errors (dead letters)</div>
-        {d.failedEvents.length === 0 && <p className="p-3 text-xs text-slate-500">None.</p>}
+        <div className="border-b border-ink-200 p-3 text-sm font-semibold dark:border-ink-800">Webhook events with errors (dead letters)</div>
+        {d.failedEvents.length === 0 && <p className="p-3 text-xs text-ink-500">None.</p>}
         {d.failedEvents.map((e: any) => (
-          <div key={e.id} className="flex items-start gap-3 border-b border-slate-100 p-3 text-xs dark:border-slate-800">
+          <div key={e.id} className="flex items-start gap-3 border-b border-ink-100 p-3 text-xs dark:border-ink-800">
             <div className="min-w-0 flex-1">
               <div className="font-medium">
                 {e.provider} · {e.externalId.slice(0, 60)} · {e.attempts} attempts · {ago(e.receivedAt)}
@@ -718,8 +718,8 @@ function ParserTab() {
   const resolve = useMutation({ mutationFn: (id: string) => post(`/api/admin/parse-failures/${id}/resolve`), onSuccess: () => qc.invalidateQueries({ queryKey: ["parse-failures"] }) });
   return (
     <div className="space-y-3">
-      <p className="text-sm text-slate-600 dark:text-slate-300">Portal emails that didn't parse cleanly. The lead was still created (nothing is lost) — open it, fix the contact details, then resolve. Add the email to <code>fixtures/portal/</code> and fix the parser so it doesn't recur.</p>
-      {q.data?.items.length === 0 && <p className="text-sm text-slate-500">Queue is empty.</p>}
+      <p className="text-sm text-ink-600 dark:text-ink-300">Portal emails that didn't parse cleanly. The lead was still created (nothing is lost) — open it, fix the contact details, then resolve. Add the email to <code>fixtures/portal/</code> and fix the parser so it doesn't recur.</p>
+      {q.data?.items.length === 0 && <p className="text-sm text-ink-500">Queue is empty.</p>}
       {q.data?.items.map((p) => (
         <div key={p.id} className="card p-3 text-sm">
           <div className="flex items-center gap-2">
@@ -735,7 +735,7 @@ function ParserTab() {
             </button>
           </div>
           <details className="mt-2 text-xs">
-            <summary className="cursor-pointer text-slate-500">Raw email</summary>
+            <summary className="cursor-pointer text-ink-500">Raw email</summary>
             <pre className="mt-1 max-h-64 overflow-auto whitespace-pre-wrap">{p.raw?.subject}{"\n\n"}{p.raw?.text}</pre>
           </details>
         </div>
@@ -751,9 +751,9 @@ function DuplicatesTab() {
   const merge = useMutation({ mutationFn: ({ id, keep }: { id: string; keep: "a" | "b" }) => post(`/api/admin/duplicates/${id}/merge`, { keep }), onSuccess: () => qc.invalidateQueries({ queryKey: ["duplicates"] }), onError: onErr });
   const dismiss = useMutation({ mutationFn: (id: string) => post(`/api/admin/duplicates/${id}/dismiss`), onSuccess: () => qc.invalidateQueries({ queryKey: ["duplicates"] }) });
   const side = (c: any, ids: any[]) => (
-    <div className="rounded-md bg-slate-50 p-2 text-xs dark:bg-slate-800">
+    <div className="rounded-md bg-ink-50 p-2 text-xs dark:bg-ink-800">
       <div className="text-sm font-medium">{c.display_name ?? "—"}</div>
-      <div className="text-slate-500">{[c.job_title, c.city].filter(Boolean).join(" · ")}</div>
+      <div className="text-ink-500">{[c.job_title, c.city].filter(Boolean).join(" · ")}</div>
       {(ids ?? []).map((i: any) => (
         <div key={i.kind + i.value} className="font-mono">
           {i.kind}: {i.value}
@@ -763,11 +763,11 @@ function DuplicatesTab() {
   );
   return (
     <div className="space-y-3">
-      <p className="text-sm text-slate-600 dark:text-slate-300">The system never auto-merges on name similarity. Merging moves identities, leads, conversations and consent to the kept contact and writes an audit record.</p>
-      {q.data?.items.length === 0 && <p className="text-sm text-slate-500">No suggestions.</p>}
+      <p className="text-sm text-ink-600 dark:text-ink-300">The system never auto-merges on name similarity. Merging moves identities, leads, conversations and consent to the kept contact and writes an audit record.</p>
+      {q.data?.items.length === 0 && <p className="text-sm text-ink-500">No suggestions.</p>}
       {q.data?.items.map((d) => (
         <div key={d.id} className="card space-y-2 p-3">
-          <div className="text-xs text-slate-500">{d.reason}</div>
+          <div className="text-xs text-ink-500">{d.reason}</div>
           <div className="grid grid-cols-2 gap-2">
             {side(d.a, d.a_identities)}
             {side(d.b, d.b_identities)}
@@ -813,7 +813,7 @@ function DataRequestsTab() {
   if (me.data?.role !== "admin") return <p className="text-sm">Admins only.</p>;
   return (
     <div className="space-y-4">
-      <p className="text-sm text-slate-600 dark:text-slate-300">DPDP data-principal rights: access, correction, erasure and grievances, with a 30-day due date. Erasure anonymises in place so aggregate reports survive; the consent ledger and audit log are kept.</p>
+      <p className="text-sm text-ink-600 dark:text-ink-300">DPDP data-principal rights: access, correction, erasure and grievances, with a 30-day due date. Erasure anonymises in place so aggregate reports survive; the consent ledger and audit log are kept.</p>
       <section className="card grid gap-2 p-3 sm:grid-cols-4">
         <select className="input" value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>
           {["access", "correction", "erasure", "grievance"].map((k) => (
@@ -826,13 +826,13 @@ function DataRequestsTab() {
           Log request
         </button>
       </section>
-      <div className="card divide-y divide-slate-100 dark:divide-slate-800">
+      <div className="card divide-y divide-ink-100 dark:divide-ink-800">
         {q.data?.items.map((r) => (
           <div key={r.id} className="flex items-center gap-3 p-3 text-sm">
-            <span className="chip bg-slate-100 dark:bg-slate-800">{r.kind}</span>
+            <span className="chip bg-ink-100 dark:bg-ink-800">{r.kind}</span>
             <div className="flex-1">
               <div>{r.requesterEmail ?? r.contactId ?? "—"}</div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-ink-500">
                 logged {dateTime(r.requestedAt)} · due {dateTime(r.dueAt)} · {r.status}
               </div>
             </div>
@@ -871,7 +871,7 @@ function AuditTab() {
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 text-xs dark:divide-slate-800">
+        <tbody className="divide-y divide-ink-100 text-xs dark:divide-ink-800">
           {q.data?.items.map((a) => (
             <tr key={a.id}>
               <td className="td text-xs">{dateTime(a.at)}</td>

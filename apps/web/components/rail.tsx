@@ -115,7 +115,7 @@ export function activityText(a: LeadDetail["timeline"][number], names: Record<st
 
 export function ContextRail({ leadId }: { leadId: string }) {
   const q = useLead(leadId);
-  if (!q.data) return <div className="p-4 text-sm text-slate-500">Loading…</div>;
+  if (!q.data) return <div className="p-4 text-sm text-ink-500">Loading…</div>;
   const { lead, contact, company, owner, identities, consent, timeline, tasks, history, enrichment, userNames } = q.data;
   const openTasks = tasks.filter((t) => !t.completedAt);
   const running = q.data.slaTimers.filter((t) => t.state === "running");
@@ -124,14 +124,14 @@ export function ContextRail({ leadId }: { leadId: string }) {
     <div className="space-y-4 p-4 text-sm">
       <section>
         <div className="text-base font-semibold">{contact.displayName ?? "Unknown contact"}</div>
-        <div className="text-slate-500">{[contact.jobTitle, company?.name].filter(Boolean).join(" · ") || "No title or company yet"}</div>
-        <div className="text-slate-500">{[contact.city ?? company?.city, contact.state].filter(Boolean).join(", ")}</div>
+        <div className="text-ink-500">{[contact.jobTitle, company?.name].filter(Boolean).join(" · ") || "No title or company yet"}</div>
+        <div className="text-ink-500">{[contact.city ?? company?.city, contact.state].filter(Boolean).join(", ")}</div>
         <ul className="mt-2 space-y-0.5 text-xs">
           {identities
             .filter((i) => i.kind !== "wa_id")
             .map((i) => (
               <li key={i.id} className="flex items-center gap-1">
-                <span className="text-slate-400">{i.kind}</span>
+                <span className="text-ink-400">{i.kind}</span>
                 <span className="font-mono">{i.valueNormalised}</span>
                 {i.kind === "email" && i.verifiedState !== "unknown" && (
                   <span className={clsx("chip", i.verifiedState === "deliverable" ? "bg-emerald-100 text-emerald-700" : i.verifiedState === "invalid" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700")}>{i.verifiedState}</span>
@@ -142,10 +142,10 @@ export function ContextRail({ leadId }: { leadId: string }) {
       </section>
 
       {company && (
-        <section className="rounded-md bg-slate-50 p-2 text-xs dark:bg-slate-800/50">
+        <section className="rounded-md bg-ink-50 p-2 text-xs dark:bg-ink-800/50">
           <div className="font-medium">{company.name}</div>
-          <div className="text-slate-500">{[company.industry, company.sizeBand && `${company.sizeBand} employees`, company.domain].filter(Boolean).join(" · ") || "Not enriched yet"}</div>
-          {enrichment && <div className="mt-1 text-[11px] text-slate-400">Doott DB {enrichment.matched ? "match" : "no match"} · {ago(enrichment.fetchedAt)}</div>}
+          <div className="text-ink-500">{[company.industry, company.sizeBand && `${company.sizeBand} employees`, company.domain].filter(Boolean).join(" · ") || "Not enriched yet"}</div>
+          {enrichment && <div className="mt-1 text-[11px] text-ink-400">Doott DB {enrichment.matched ? "match" : "no match"} · {ago(enrichment.fetchedAt)}</div>}
         </section>
       )}
 
@@ -171,13 +171,13 @@ export function ContextRail({ leadId }: { leadId: string }) {
         <div className="col-span-2">
           <div className="label">Source</div>
           <SourceLabel source={lead.source} />
-          {lead.sourceDetail && <span className="text-slate-500"> · {lead.sourceDetail}</span>}
+          {lead.sourceDetail && <span className="text-ink-500"> · {lead.sourceDetail}</span>}
         </div>
         <div className="col-span-2">
           <div className="label">Next step</div>
           {lead.nextStep ? (
             <span>
-              {lead.nextStep} <span className={clsx(lead.nextStepAt && new Date(lead.nextStepAt) < new Date() ? "text-red-600" : "text-slate-500")}>· {dateTime(lead.nextStepAt)}</span>
+              {lead.nextStep} <span className={clsx(lead.nextStepAt && new Date(lead.nextStepAt) < new Date() ? "text-red-600" : "text-ink-500")}>· {dateTime(lead.nextStepAt)}</span>
             </span>
           ) : (
             <span className="text-amber-600">Not set</span>
@@ -216,11 +216,11 @@ export function ContextRail({ leadId }: { leadId: string }) {
       <section>
         <div className="label">Consent</div>
         <div className="flex flex-wrap gap-1 text-[11px]">
-          <span className={clsx("chip", consent.whatsapp.optedOut ? "bg-red-100 text-red-700" : consent.whatsapp.utility ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600")}>
+          <span className={clsx("chip", consent.whatsapp.optedOut ? "bg-red-100 text-red-700" : consent.whatsapp.utility ? "bg-emerald-100 text-emerald-700" : "bg-ink-100 text-ink-600")}>
             WA {consent.whatsapp.optedOut ? "opted out" : consent.whatsapp.utility ? "utility ✓" : "no consent"}
           </span>
-          <span className={clsx("chip", consent.whatsapp.marketing ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600")}>WA marketing {consent.whatsapp.marketing ? "✓" : "✗"}</span>
-          <span className={clsx("chip", consent.email.unsubscribed ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-600")}>Email {consent.email.unsubscribed ? "unsubscribed" : consent.email.marketing ? "marketing ✓" : "1:1 only"}</span>
+          <span className={clsx("chip", consent.whatsapp.marketing ? "bg-emerald-100 text-emerald-700" : "bg-ink-100 text-ink-600")}>WA marketing {consent.whatsapp.marketing ? "✓" : "✗"}</span>
+          <span className={clsx("chip", consent.email.unsubscribed ? "bg-red-100 text-red-700" : "bg-ink-100 text-ink-600")}>Email {consent.email.unsubscribed ? "unsubscribed" : consent.email.marketing ? "marketing ✓" : "1:1 only"}</span>
           {contact.doNotContact && <span className="chip bg-red-600 text-white">Do not contact</span>}
         </div>
       </section>
@@ -232,7 +232,7 @@ export function ContextRail({ leadId }: { leadId: string }) {
             {openTasks.map((t) => (
               <li key={t.id} className="flex justify-between gap-2">
                 <span>{t.title}</span>
-                <span className={clsx(t.dueAt && new Date(t.dueAt) < new Date() ? "text-red-600" : "text-slate-500")}>{ago(t.dueAt)}</span>
+                <span className={clsx(t.dueAt && new Date(t.dueAt) < new Date() ? "text-red-600" : "text-ink-500")}>{ago(t.dueAt)}</span>
               </li>
             ))}
           </ul>
@@ -244,8 +244,8 @@ export function ContextRail({ leadId }: { leadId: string }) {
         <ul className="space-y-1.5 text-xs">
           {timeline.slice(0, 5).map((a) => (
             <li key={a.id}>
-              <span className="font-medium">{ACTIVITY_LABEL[a.type] ?? a.type}</span> <span className="text-slate-500">{activityText(a, userNames)}</span>
-              <div className="text-[11px] text-slate-400">{ago(a.occurredAt)}</div>
+              <span className="font-medium">{ACTIVITY_LABEL[a.type] ?? a.type}</span> <span className="text-ink-500">{activityText(a, userNames)}</span>
+              <div className="text-[11px] text-ink-400">{ago(a.occurredAt)}</div>
             </li>
           ))}
         </ul>
@@ -260,7 +260,7 @@ export function ContextRail({ leadId }: { leadId: string }) {
                 <Link href={`/leads/${h.id}`} className="text-brand-600 hover:underline">
                   L-{h.number}
                 </Link>{" "}
-                <StageBadge stage={h.stage} /> <span className="text-slate-500">{dateTime(h.openedAt)}</span>
+                <StageBadge stage={h.stage} /> <span className="text-ink-500">{dateTime(h.openedAt)}</span>
               </li>
             ))}
           </ul>

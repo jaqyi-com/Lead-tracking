@@ -116,23 +116,23 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer({ co
   );
 
   if (disabledReason) {
-    return <div className="border-t border-slate-200 bg-slate-50 p-3 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-900">{disabledReason}</div>;
+    return <div className="border-t border-ink-200 bg-ink-50 p-3 text-sm text-ink-600 dark:border-ink-800 dark:bg-ink-900">{disabledReason}</div>;
   }
 
   const canSend = text.trim().length > 0 || files.length > 0;
   const replyDisabled = mode === "reply" && waClosed;
 
   return (
-    <div className={clsx("border-t p-3", mode === "note" ? "border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40" : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900")}>
+    <div className={clsx("border-t px-4 py-3 lg:px-6", mode === "note" ? "border-amber-300 bg-amber-50" : "border-ink-200 bg-white")}>
       <div className="mb-2 flex items-center gap-2 text-xs">
-        <button className={clsx("rounded px-2 py-1 font-medium", mode === "reply" ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900" : "text-slate-600")} onClick={() => setMode("reply")}>
+        <button className={clsx("rounded-lg px-3 py-1.5 font-semibold transition", mode === "reply" ? "bg-brand-600 text-white shadow-glow" : "text-ink-600 hover:bg-ink-100")} onClick={() => setMode("reply")}>
           Reply
         </button>
-        <button className={clsx("rounded px-2 py-1 font-medium", mode === "note" ? "bg-amber-500 text-white" : "text-slate-600")} onClick={() => setMode("note")}>
+        <button className={clsx("rounded-lg px-3 py-1.5 font-semibold transition", mode === "note" ? "bg-amber-500 text-white" : "text-ink-600")} onClick={() => setMode("note")}>
           Internal note
         </button>
         {mode === "reply" && conversation.channel === "whatsapp" && (
-          <span className={clsx("chip ml-auto", waOpen ? (msLeft < 2 * 3600_000 ? "bg-amber-100 text-amber-800" : "bg-wa-50 text-wa-600") : "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200")}>
+          <span className={clsx("chip ml-auto", waOpen ? (msLeft < 2 * 3600_000 ? "bg-amber-100 text-amber-800" : "bg-wa-50 text-wa-600") : "bg-ink-200 text-ink-700 dark:bg-ink-700 dark:text-ink-200")}>
             {waOpen ? `Window closes in ${countdown(msLeft)}` : "24h window closed — templates only"}
           </span>
         )}
@@ -166,11 +166,11 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer({ co
         {filteredSnippets.length > 0 && (
           <div className="card absolute bottom-full left-0 z-20 mb-1 w-96 p-1">
             {filteredSnippets.map((s) => (
-              <button key={s.id} className="block w-full rounded px-2 py-1.5 text-left hover:bg-slate-50 dark:hover:bg-slate-800" onClick={() => insertSnippet(s)}>
+              <button key={s.id} className="block w-full rounded px-2 py-1.5 text-left hover:bg-ink-50 dark:hover:bg-ink-800" onClick={() => insertSnippet(s)}>
                 <div className="text-sm font-medium">
-                  /{s.shortcut} <span className="font-normal text-slate-500">— {s.title}</span>
+                  /{s.shortcut} <span className="font-normal text-ink-500">— {s.title}</span>
                 </div>
-                <div className="line-clamp-1 text-xs text-slate-500">{s.body}</div>
+                <div className="line-clamp-1 text-xs text-ink-500">{s.body}</div>
               </button>
             ))}
           </div>
@@ -180,7 +180,7 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer({ co
       {mode === "note" && (
         <div className="mt-2 flex flex-wrap gap-1">
           {meta.data?.users.map((u) => (
-            <button key={u.id} className={clsx("chip border", mentions.includes(u.id) ? "border-amber-600 bg-amber-200" : "border-amber-300 bg-white dark:bg-slate-900")} onClick={() => setMentions((m) => (m.includes(u.id) ? m.filter((x) => x !== u.id) : [...m, u.id]))}>
+            <button key={u.id} className={clsx("chip border", mentions.includes(u.id) ? "border-amber-600 bg-amber-200" : "border-amber-300 bg-white dark:bg-ink-900")} onClick={() => setMentions((m) => (m.includes(u.id) ? m.filter((x) => x !== u.id) : [...m, u.id]))}>
               @{u.name.split(" ")[0]}
             </button>
           ))}
@@ -190,7 +190,7 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer({ co
       {files.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
           {files.map((f) => (
-            <span key={f.id} className="chip bg-slate-100 dark:bg-slate-800">
+            <span key={f.id} className="chip bg-ink-100 dark:bg-ink-800">
               📎 {f.filename}
               <button onClick={() => setFiles((x) => x.filter((y) => y.id !== f.id))} aria-label="Remove">
                 ✕
@@ -229,12 +229,12 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer({ co
           </button>
         )}
         {mode === "reply" && conversation.channel === "email" && (
-          <label className="flex items-center gap-1 text-xs text-slate-500">
+          <label className="flex items-center gap-1 text-xs text-ink-500">
             Send later
             <input type="datetime-local" className="input h-7 w-auto py-0 text-xs" value={sendAt} onChange={(e) => setSendAt(e.target.value)} />
           </label>
         )}
-        <span className="ml-auto hidden text-[11px] text-slate-400 sm:inline">
+        <span className="ml-auto hidden text-[11px] text-ink-400 sm:inline">
           {mode === "reply" && conversation.channel === "whatsapp" ? "Each WhatsApp reply is billed — prefer one complete message." : ""}
         </span>
         <button className={mode === "note" ? "btn bg-amber-500 text-white hover:bg-amber-600" : "btn-primary"} disabled={!canSend || send.isPending || replyDisabled} onClick={() => send.mutate()}>
@@ -279,7 +279,7 @@ function TemplatePicker({ conversationId, leadId, windowOpen, onClose }: { conve
   const others = (templates.data?.items ?? []).filter((t) => t.approvalStatus !== "approved");
 
   return (
-    <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/50">
+    <div className="mt-3 rounded-lg border border-ink-200 bg-ink-50 p-3 dark:border-ink-700 dark:bg-ink-800/50">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-sm font-semibold">{windowOpen ? "Send a template" : "Window closed — choose an approved template"}</span>
         <button className="btn-ghost text-xs" onClick={onClose}>
@@ -290,23 +290,23 @@ function TemplatePicker({ conversationId, leadId, windowOpen, onClose }: { conve
         <ul className="max-h-60 space-y-1 overflow-y-auto">
           {approved.map((t) => (
             <li key={t.id}>
-              <button className={clsx("w-full rounded-md px-2 py-1.5 text-left text-sm", selected?.id === t.id ? "bg-brand-600 text-white" : "hover:bg-white dark:hover:bg-slate-700")} onClick={() => setSelected(t)}>
+              <button className={clsx("w-full rounded-md px-2 py-1.5 text-left text-sm", selected?.id === t.id ? "bg-brand-600 text-white" : "hover:bg-white dark:hover:bg-ink-700")} onClick={() => setSelected(t)}>
                 <div className="font-medium">{t.internalName}</div>
-                <div className={clsx("text-[11px]", selected?.id === t.id ? "text-white/80" : "text-slate-500")}>
+                <div className={clsx("text-[11px]", selected?.id === t.id ? "text-white/80" : "text-ink-500")}>
                   {t.category} · ₹{t.costPerMessage.toFixed(4)}/msg{t.category === "marketing" ? " · needs opt-in" : ""}
                 </div>
               </button>
             </li>
           ))}
-          {others.length > 0 && <li className="px-2 pt-2 text-[11px] uppercase tracking-wide text-slate-400">Not approved yet</li>}
+          {others.length > 0 && <li className="px-2 pt-2 text-[11px] uppercase tracking-wide text-ink-400">Not approved yet</li>}
           {others.map((t) => (
-            <li key={t.id} className="px-2 py-1 text-xs text-slate-400" title="Waiting for Meta approval">
+            <li key={t.id} className="px-2 py-1 text-xs text-ink-400" title="Waiting for Meta approval">
               {t.internalName} — {t.approvalStatus}
             </li>
           ))}
         </ul>
         <div>
-          {!selected && <p className="text-sm text-slate-500">Pick a template to preview it with this lead's details filled in.</p>}
+          {!selected && <p className="text-sm text-ink-500">Pick a template to preview it with this lead's details filled in.</p>}
           {selected && (
             <div className="space-y-2">
               {selected.variables.map((v) => (
@@ -315,9 +315,9 @@ function TemplatePicker({ conversationId, leadId, windowOpen, onClose }: { conve
                   <input className="input" value={values[v.key] ?? ""} placeholder={v.example} onChange={(e) => setValues((x) => ({ ...x, [v.key]: e.target.value }))} />
                 </div>
               ))}
-              <div className="whitespace-pre-wrap rounded-lg bg-wa-50 p-3 text-sm text-slate-800 dark:bg-emerald-950 dark:text-emerald-50">{rendered}</div>
+              <div className="whitespace-pre-wrap rounded-lg bg-wa-50 p-3 text-sm text-ink-800 dark:bg-emerald-950 dark:text-emerald-50">{rendered}</div>
               <div className="flex items-center justify-between gap-2">
-                <span className={clsx("text-xs", selected.category === "marketing" ? "font-semibold text-amber-700" : "text-slate-500")}>
+                <span className={clsx("text-xs", selected.category === "marketing" ? "font-semibold text-amber-700" : "text-ink-500")}>
                   Cost class: {selected.category} (≈₹{selected.costPerMessage.toFixed(4)})
                   {selected.category === "marketing" ? " — about 7.5× a service message" : ""}
                 </span>

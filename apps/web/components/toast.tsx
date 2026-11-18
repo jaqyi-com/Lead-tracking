@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             className={clsx(
               "pointer-events-auto rounded-md px-3 py-2 text-sm shadow-lg",
-              t.kind === "error" ? "bg-red-600 text-white" : "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900",
+              t.kind === "error" ? "bg-red-600 text-white" : "bg-ink-900 text-white dark:bg-ink-100 dark:text-ink-900",
             )}
           >
             {t.text}

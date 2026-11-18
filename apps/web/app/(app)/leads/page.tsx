@@ -47,10 +47,10 @@ function LeadsInner() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
-        <h1 className="mr-2 text-lg font-semibold">Leads</h1>
-        <input className="input h-8 w-56" placeholder="Name, company, L-123…" defaultValue={params.get("q") ?? ""} onKeyDown={(e) => e.key === "Enter" && set("q", (e.target as HTMLInputElement).value)} />
-        <select className="input h-8 w-auto" value={params.get("stage") ?? ""} onChange={(e) => set("stage", e.target.value)}>
+      <div className="flex flex-wrap items-center gap-2 border-b border-ink-200 bg-white p-3 dark:border-ink-800 dark:bg-ink-900">
+        <h1 className="page-title mr-4">Leads</h1>
+        <input className="input h-9 py-1 w-56" placeholder="Name, company, L-123…" defaultValue={params.get("q") ?? ""} onKeyDown={(e) => e.key === "Enter" && set("q", (e.target as HTMLInputElement).value)} />
+        <select className="input h-9 py-1 w-auto" value={params.get("stage") ?? ""} onChange={(e) => set("stage", e.target.value)}>
           <option value="">All stages</option>
           {meta.data?.stages.map((s) => (
             <option key={s} value={s}>
@@ -58,7 +58,7 @@ function LeadsInner() {
             </option>
           ))}
         </select>
-        <select className="input h-8 w-auto" value={params.get("source") ?? ""} onChange={(e) => set("source", e.target.value)}>
+        <select className="input h-9 py-1 w-auto" value={params.get("source") ?? ""} onChange={(e) => set("source", e.target.value)}>
           <option value="">All sources</option>
           {(meta.data?.sources as { key: string; label: string }[] | undefined)?.map((s) => (
             <option key={s.key} value={s.key}>
@@ -66,7 +66,7 @@ function LeadsInner() {
             </option>
           ))}
         </select>
-        <select className="input h-8 w-auto" value={params.get("owner") ?? ""} onChange={(e) => set("owner", e.target.value)}>
+        <select className="input h-9 py-1 w-auto" value={params.get("owner") ?? ""} onChange={(e) => set("owner", e.target.value)}>
           <option value="">Any owner</option>
           <option value="me">Me</option>
           <option value="none">Unassigned</option>
@@ -77,12 +77,12 @@ function LeadsInner() {
               </option>
             ))}
         </select>
-        <select className="input h-8 w-auto" value={params.get("open") ?? ""} onChange={(e) => set("open", e.target.value)}>
+        <select className="input h-9 py-1 w-auto" value={params.get("open") ?? ""} onChange={(e) => set("open", e.target.value)}>
           <option value="">Open & closed</option>
           <option value="true">Open</option>
           <option value="false">Closed</option>
         </select>
-        <select className="input h-8 w-auto" value={params.get("sort") ?? "recent"} onChange={(e) => set("sort", e.target.value)}>
+        <select className="input h-9 py-1 w-auto" value={params.get("sort") ?? "recent"} onChange={(e) => set("sort", e.target.value)}>
           <option value="recent">Newest</option>
           <option value="score">Score</option>
           <option value="activity">Last activity</option>
@@ -101,7 +101,7 @@ function LeadsInner() {
       </div>
       <div className="min-h-0 flex-1 overflow-auto">
         <table className="min-w-full">
-          <thead className="sticky top-0 bg-slate-50 dark:bg-slate-900">
+          <thead className="sticky top-0 bg-ink-50 dark:bg-ink-900">
             <tr>
               <th className="th">Lead</th>
               <th className="th">Contact</th>
@@ -115,16 +115,16 @@ function LeadsInner() {
               <th className="th">Activity</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-slate-950">
+          <tbody className="divide-y divide-ink-100 bg-white dark:divide-ink-800 dark:bg-ink-900">
             {q.data?.items.map((l) => (
-              <tr key={l.id} className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900" onClick={() => router.push(`/leads/${l.id}`)}>
+              <tr key={l.id} className="cursor-pointer hover:bg-ink-50 dark:hover:bg-ink-900" onClick={() => router.push(`/leads/${l.id}`)}>
                 <td className="td font-medium">
                   <Link href={`/leads/${l.id}`}>L-{l.number}</Link>
                   {l.parse_failed && <span className="chip ml-1 bg-amber-100 text-amber-800">parse failed</span>}
                 </td>
                 <td className="td">
                   <div className="font-medium">{l.contact_name ?? "—"}</div>
-                  <div className="text-xs text-slate-500">{l.company_name}</div>
+                  <div className="text-xs text-ink-500">{l.company_name}</div>
                 </td>
                 <td className="td">
                   <StageBadge stage={l.stage} />
@@ -141,23 +141,23 @@ function LeadsInner() {
                   {l.next_step ? (
                     <>
                       <div className="line-clamp-1">{l.next_step}</div>
-                      <div className={l.next_step_at && new Date(l.next_step_at) < new Date() ? "text-red-600" : "text-slate-500"}>{dateTime(l.next_step_at)}</div>
+                      <div className={l.next_step_at && new Date(l.next_step_at) < new Date() ? "text-red-600" : "text-ink-500"}>{dateTime(l.next_step_at)}</div>
                     </>
                   ) : (
                     "—"
                   )}
                 </td>
                 <td className="td text-xs tabular-nums">{l.first_response_business_minutes != null ? `${l.first_response_business_minutes}m` : "—"}</td>
-                <td className="td text-xs text-slate-500">{ago(l.last_activity_at)}</td>
+                <td className="td text-xs text-ink-500">{ago(l.last_activity_at)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        {q.data && q.data.items.length === 0 && <p className="p-8 text-center text-sm text-slate-500">No leads match.</p>}
+        {q.data && q.data.items.length === 0 && <p className="p-8 text-center text-sm text-ink-500">No leads match.</p>}
       </div>
       {q.data && q.data.total > q.data.pageSize && (
-        <div className="flex items-center justify-end gap-2 border-t border-slate-200 bg-white p-2 text-sm dark:border-slate-800 dark:bg-slate-900">
-          <span className="text-slate-500">
+        <div className="flex items-center justify-end gap-2 border-t border-ink-200 bg-white p-2 text-sm dark:border-ink-800 dark:bg-ink-900">
+          <span className="text-ink-500">
             {(page - 1) * q.data.pageSize + 1}–{Math.min(page * q.data.pageSize, q.data.total)} of {q.data.total}
           </span>
           <button className="btn" disabled={page <= 1} onClick={() => router.replace(`/leads?${new URLSearchParams({ ...Object.fromEntries(params), page: String(page - 1) })}`)}>

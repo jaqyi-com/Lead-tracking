@@ -138,7 +138,7 @@ export function Thread({ conversationId, onBack, onNext }: { conversationId: str
     return items.sort((a, b) => a.at.localeCompare(b.at));
   }, [q.data, conversationId]);
 
-  if (q.isLoading) return <div className="p-6 text-sm text-slate-500">Loading…</div>;
+  if (q.isLoading) return <div className="p-6 text-sm text-ink-500">Loading…</div>;
   if (q.isError || !q.data) return <div className="p-6 text-sm text-red-600">{q.error instanceof ApiError ? q.error.message : "Couldn't load conversation"}</div>;
   const { conversation, lead } = q.data;
   const viewers = (presence[conversationId] ?? []).filter((v) => v.userId !== me.data?.id);
@@ -148,12 +148,12 @@ export function Thread({ conversationId, onBack, onNext }: { conversationId: str
   return (
     <div className="flex h-full">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex flex-wrap items-center gap-2 border-b border-ink-200 bg-white px-4 py-3">
           <button className="btn-ghost lg:hidden" onClick={onBack} aria-label="Back">
             ←
           </button>
           <ChannelIcon channel={conversation.channel} />
-          <Link href={`/leads/${lead.id}`} className="font-semibold hover:underline">
+          <Link href={`/leads/${lead.id}`} className="font-display text-base font-bold text-ink-900 hover:text-brand-600">
             L-{lead.number}
           </Link>
           <button onClick={() => setDialog("stage")} title="Change stage (s)">
@@ -173,7 +173,7 @@ export function Thread({ conversationId, onBack, onNext }: { conversationId: str
               {viewers.map((v) => `${v.name.split(" ")[0]} ${v.typing ? "is typing…" : "is viewing"}`).join(", ")}
             </span>
           )}
-          <div className="ml-auto flex flex-wrap items-center gap-1">
+          <div className="ml-auto flex flex-wrap items-center gap-1 [&_.btn]:h-8 [&_.btn]:px-2.5 [&_.btn]:text-xs [&_.btn-primary]:h-8 [&_.btn-primary]:text-xs">
             {!lead.ownerId && (
               <button className="btn-primary" onClick={() => claim.mutate()} title="Assign to me (a)">
                 Claim
@@ -215,10 +215,10 @@ export function Thread({ conversationId, onBack, onNext }: { conversationId: str
           <div className="bg-amber-50 px-3 py-1 text-xs text-amber-800 dark:bg-amber-950 dark:text-amber-200">Someone else is composing a reply on this conversation.</div>
         )}
 
-        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto bg-slate-50 px-3 py-4 dark:bg-slate-950">
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-ink-50 px-4 py-5 lg:px-8">
           {timeline.map((item) =>
             item.kind === "note" ? (
-              <div key={item.n.id} className="mx-auto max-w-2xl rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm dark:border-amber-800 dark:bg-amber-950/50">
+              <div key={item.n.id} className="mx-auto max-w-2xl rounded-xl border border-dashed border-amber-300 bg-amber-50 px-4 py-2.5 text-sm">
                 <div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
                   Internal note · {item.n.authorName} · {dateTime(item.n.createdAt)}
                 </div>
@@ -239,7 +239,7 @@ export function Thread({ conversationId, onBack, onNext }: { conversationId: str
         />
       </div>
 
-      <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 xl:block">
+      <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 xl:block">
         <ContextRail leadId={lead.id} />
       </aside>
 
@@ -270,13 +270,17 @@ function MessageBubble({ m, onRetry }: { m: Msg; onRetry: () => void }) {
     <div className={clsx("flex", out ? "justify-end" : "justify-start")}>
       <div
         className={clsx(
-          "max-w-[85%] rounded-2xl px-3 py-2 text-sm shadow-sm md:max-w-[70%]",
-          out ? (m.isAuto ? "bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-100" : m.channel === "whatsapp" ? "bg-emerald-100 text-slate-900 dark:bg-emerald-900/60 dark:text-emerald-50" : "bg-sky-100 text-slate-900 dark:bg-sky-900/50 dark:text-sky-50") : "bg-white dark:bg-slate-900",
+          "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm md:max-w-[68%]",
+          out
+            ? m.isAuto
+              ? "rounded-br-md bg-ink-100 text-ink-700 ring-1 ring-ink-200"
+              : "rounded-br-md bg-brand-600 text-white shadow-glow [&_a]:text-white"
+            : "rounded-bl-md bg-white text-ink-900 shadow-card ring-1 ring-ink-200",
           m.status === "failed" && "ring-2 ring-red-400",
           m.isAutoReply && "opacity-70",
         )}
       >
-        {(m.subject && m.channel === "email") && <div className="mb-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{m.subject}</div>}
+        {(m.subject && m.channel === "email") && <div className={clsx("mb-1 text-xs font-semibold", out && !m.isAuto ? "text-white/90" : "text-ink-600")}>{m.subject}</div>}
         {m.media.map((a) =>
           a.url && a.mime?.startsWith("image/") ? (
             <a key={a.id} href={a.url} target="_blank" rel="noreferrer">
@@ -290,7 +294,7 @@ function MessageBubble({ m, onRetry }: { m: Msg; onRetry: () => void }) {
         )}
         {m.body && <div className="whitespace-pre-wrap break-words">{full ?? m.body}</div>}
         {m.hasFullBody && !full && (
-          <button className="mt-1 text-[11px] text-slate-500 underline" onClick={() => api<{ bodyFull: string }>(`/api/messages/${m.id}/full`).then((r) => setFull(r.bodyFull))}>
+          <button className="mt-1 text-[11px] text-ink-500 underline" onClick={() => api<{ bodyFull: string }>(`/api/messages/${m.id}/full`).then((r) => setFull(r.bodyFull))}>
             Show full email
           </button>
         )}
@@ -302,7 +306,7 @@ function MessageBubble({ m, onRetry }: { m: Msg; onRetry: () => void }) {
             </button>
           </div>
         )}
-        <div className="mt-1 flex items-center justify-end gap-2 text-[10px] text-slate-500">
+        <div className={clsx("mt-1 flex items-center justify-end gap-2 text-[10px]", out && !m.isAuto ? "text-white/75" : "text-ink-400")}>
           {m.isAutoReply && <span>auto-reply</span>}
           {out && <span>{m.authorName ?? (m.isAuto ? "Automatic" : "")}</span>}
           {m.kind === "template" && <span className="chip bg-white/60 dark:bg-black/20">template{m.pricingCategory ? ` · ${m.pricingCategory}` : ""}</span>}

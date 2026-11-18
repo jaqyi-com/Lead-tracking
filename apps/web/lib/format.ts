@@ -12,7 +12,7 @@ export const STAGE_LABEL: Record<string, string> = {
 };
 
 export const STAGE_COLOR: Record<string, string> = {
-  new: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200",
+  new: "bg-ink-100 text-ink-700 dark:bg-ink-800 dark:text-ink-200",
   attempting: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-200",
   engaged: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200",
   qualified: "bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200",
@@ -78,5 +78,5 @@ export function initials(name?: string | null): string {
 export function scoreBand(score: number): { label: string; cls: string } {
   if (score >= 60) return { label: "Hot", cls: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200" };
   if (score >= 30) return { label: "Warm", cls: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200" };
-  return { label: "Low", cls: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" };
+  return { label: "Low", cls: "bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-300" };
 }

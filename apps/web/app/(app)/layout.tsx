@@ -8,25 +8,30 @@ import { api, patch, post } from "@/lib/api";
 import { useHotkeys, useMe, isManager } from "@/lib/hooks";
 import { RealtimeProvider } from "@/lib/realtime";
 import { ago, initials } from "@/lib/format";
+import { Logo } from "@/components/logo";
+import { IconBell, IconChart, IconInbox, IconKanban, IconLogout, IconMenu, IconSearch, IconSettings, IconShield, IconSun, IconUsers } from "@/components/icons";
 
-const NAV = [
-  { href: "/inbox", label: "Inbox", key: "g i" },
-  { href: "/my-day", label: "My day", key: "g d" },
-  { href: "/leads", label: "Leads", key: "g l" },
-  { href: "/pipeline", label: "Pipeline", key: "g p" },
-  { href: "/reports", label: "Reports", key: "g r" },
-];
+type NavItem = { href: string; label: string; key: string; icon: (p: { size?: number }) => React.ReactNode; badge?: number };
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const me = useMe();
   const [helpOpen, setHelpOpen] = useState(false);
+  const [mobileNav, setMobileNav] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  const badge = useQuery({
+    queryKey: ["conversations", "badge"],
+    queryFn: () => api<{ counts: Record<string, number> }>("/api/conversations?filter=unassigned&limit=1"),
+    refetchInterval: 20_000,
+    enabled: !!me.data && me.data.role !== "viewer",
+  });
 
   useEffect(() => {
     if (me.isError) router.replace("/login");
   }, [me.isError, router]);
+  useEffect(() => setMobileNav(false), [pathname]);
 
   useHotkeys(
     {
@@ -52,41 +57,127 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  if (!me.data) return <div className="flex h-full items-center justify-center text-sm text-slate-500">Loading…</div>;
+  if (!me.data) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Logo compact />
+          <div className="h-1 w-24 overflow-hidden rounded-full bg-ink-200">
+            <div className="h-full w-1/2 animate-pulse rounded-full bg-brand-600" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const nav = [...NAV, ...(isManager(me.data) ? [{ href: "/admin", label: "Admin", key: "g a" }] : []), { href: "/settings", label: "Settings", key: "" }];
+  const unassigned = badge.data?.counts?.unassigned ?? 0;
+  const work: NavItem[] = [
+    { href: "/inbox", label: "Inbox", key: "G I", icon: IconInbox, badge: unassigned },
+    { href: "/my-day", label: "My day", key: "G D", icon: IconSun },
+    { href: "/leads", label: "Leads", key: "G L", icon: IconUsers },
+    { href: "/pipeline", label: "Pipeline", key: "G P", icon: IconKanban },
+  ];
+  const insight: NavItem[] = [
+    { href: "/reports", label: "Reports", key: "G R", icon: IconChart },
+    ...(isManager(me.data) ? [{ href: "/admin", label: "Admin", key: "G A", icon: IconShield }] : []),
+    { href: "/settings", label: "Settings", key: "", icon: IconSettings },
+  ];
+
+  const NavGroup = ({ title, items }: { title: string; items: NavItem[] }) => (
+    <div>
+      <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-ink-400">{title}</div>
+      <ul className="space-y-0.5">
+        {items.map((n) => {
+          const active = pathname.startsWith(n.href);
+          const Icon = n.icon;
+          return (
+            <li key={n.href}>
+              <Link
+                href={n.href}
+                className={clsx(
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+                  active ? "bg-brand-50 text-brand-700" : "text-ink-600 hover:bg-ink-100 hover:text-ink-900",
+                )}
+              >
+                {active && <span className="absolute -left-3 top-1.5 h-[calc(100%-12px)] w-1 rounded-r-full bg-brand-600" />}
+                <span className={clsx(active ? "text-brand-600" : "text-ink-400 group-hover:text-ink-700")}>
+                  <Icon size={18} />
+                </span>
+                <span className="flex-1">{n.label}</span>
+                {!!n.badge && <span className="min-w-[20px] rounded-full bg-brand-600 px-1.5 py-px text-center text-[11px] font-bold text-white shadow-glow">{n.badge > 99 ? "99+" : n.badge}</span>}
+                {!n.badge && n.key && <span className="hidden font-mono text-[10px] text-ink-300 group-hover:inline">{n.key}</span>}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+
+  const sidebar = (
+    <div className="flex h-full flex-col bg-white">
+      <div className="flex h-16 items-center px-5">
+        <Link href="/inbox">
+          <Logo />
+        </Link>
+      </div>
+      <nav className="flex-1 space-y-6 overflow-y-auto px-3 pt-2">
+        <NavGroup title="Work" items={work} />
+        <NavGroup title="Insight" items={insight} />
+      </nav>
+      <div className="m-3 rounded-xl border border-ink-200 bg-ink-50 p-3">
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-700 text-xs font-bold text-white">{initials(me.data.name)}</span>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-sm font-semibold text-ink-900">{me.data.name}</div>
+            <div className="truncate text-xs capitalize text-ink-500">{me.data.role}</div>
+          </div>
+          <button
+            className="rounded-md p-1.5 text-ink-400 transition hover:bg-white hover:text-brand-600"
+            title="Sign out"
+            onClick={async () => {
+              await post("/api/auth/logout");
+              window.location.href = "/login";
+            }}
+          >
+            <IconLogout size={16} />
+          </button>
+        </div>
+        <Availability available={me.data.isAvailable} />
+      </div>
+    </div>
+  );
 
   return (
     <RealtimeProvider>
-      <div className="flex h-full flex-col">
-        <header className="flex h-12 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-3 dark:border-slate-800 dark:bg-slate-900">
-          <Link href="/inbox" className="flex items-center gap-2 font-semibold">
-            <img src="/icon.svg" alt="" className="h-6 w-6" />
-            <span className="hidden sm:inline">Lead OS</span>
-          </Link>
-          <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto">
-            {nav.map((n) => (
-              <Link
-                key={n.href}
-                href={n.href}
-                title={n.key ? `${n.label} (${n.key})` : n.label}
-                className={clsx(
-                  "whitespace-nowrap rounded-md px-2.5 py-1 text-sm",
-                  pathname.startsWith(n.href) ? "bg-slate-100 font-medium text-slate-900 dark:bg-slate-800 dark:text-white" : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800",
-                )}
-              >
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-          <GlobalSearch inputRef={searchRef} />
-          <Availability available={me.data.isAvailable} />
-          <Notifications />
-          <span title={`${me.data.name} (${me.data.role})`} className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
-            {initials(me.data.name)}
-          </span>
-        </header>
-        <main className="min-h-0 flex-1">{children}</main>
+      <div className="flex h-full">
+        <aside className="hidden w-64 shrink-0 border-r border-ink-200 lg:block">{sidebar}</aside>
+        {mobileNav && (
+          <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setMobileNav(false)}>
+            <div className="absolute inset-0 bg-ink-900/30 backdrop-blur-sm" />
+            <aside className="absolute inset-y-0 left-0 w-72 animate-fade-in shadow-lift" onClick={(e) => e.stopPropagation()}>
+              {sidebar}
+            </aside>
+          </div>
+        )}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="flex h-16 shrink-0 items-center gap-3 border-b border-ink-200 bg-white/90 px-4 backdrop-blur lg:px-6">
+            <button className="btn-ghost lg:hidden" onClick={() => setMobileNav(true)} aria-label="Open menu">
+              <IconMenu />
+            </button>
+            <span className="lg:hidden">
+              <Logo compact />
+            </span>
+            <GlobalSearch inputRef={searchRef} />
+            <div className="ml-auto flex items-center gap-1">
+              <button className="btn-ghost hidden text-xs md:inline-flex" onClick={() => setHelpOpen(true)} title="Keyboard shortcuts">
+                <span className="kbd">?</span> Shortcuts
+              </button>
+              <Notifications />
+            </div>
+          </header>
+          <main className="min-h-0 flex-1 overflow-hidden bg-ink-50">{children}</main>
+        </div>
         {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} />}
       </div>
     </RealtimeProvider>
@@ -101,12 +192,20 @@ function Availability({ available }: { available: boolean }) {
   });
   return (
     <button
-      className={clsx("chip hidden border sm:inline-flex", available ? "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : "border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800")}
       onClick={() => m.mutate(!available)}
       title="Routing only assigns new leads to available reps"
+      className="mt-3 flex w-full items-center justify-between rounded-lg bg-white px-3 py-2 text-xs font-semibold shadow-card ring-1 ring-ink-200 transition hover:ring-ink-300"
     >
-      <span className={clsx("h-1.5 w-1.5 rounded-full", available ? "bg-emerald-500" : "bg-slate-400")} />
-      {available ? "Available" : "Away"}
+      <span className="flex items-center gap-2">
+        <span className={clsx("relative flex h-2 w-2", available && "text-emerald-500")}>
+          {available && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />}
+          <span className={clsx("relative inline-flex h-2 w-2 rounded-full", available ? "bg-emerald-500" : "bg-ink-300")} />
+        </span>
+        {available ? "Available for new leads" : "Away — not receiving leads"}
+      </span>
+      <span className={clsx("relative h-4 w-7 rounded-full transition", available ? "bg-emerald-500" : "bg-ink-300")}>
+        <span className={clsx("absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition", available ? "left-3.5" : "left-0.5")} />
+      </span>
     </button>
   );
 }
@@ -132,11 +231,14 @@ function GlobalSearch({ inputRef }: { inputRef: React.RefObject<HTMLInputElement
     else if (h.leadId) router.push(`/leads/${h.leadId}`);
   };
   return (
-    <div className="relative hidden md:block">
+    <div className="relative hidden w-full max-w-md md:block">
+      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-400">
+        <IconSearch size={16} />
+      </span>
       <input
         ref={inputRef}
-        className="input h-8 w-64"
-        placeholder="Search people, companies, messages  ⌘K"
+        className="input h-10 rounded-xl border-ink-200 bg-ink-50 pl-9 pr-14 shadow-none focus:bg-white"
+        placeholder="Search people, companies, messages…"
         value={q}
         onChange={(e) => {
           setQ(e.target.value);
@@ -149,17 +251,18 @@ function GlobalSearch({ inputRef }: { inputRef: React.RefObject<HTMLInputElement
         }}
         aria-label="Search"
       />
+      <span className="kbd pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">⌘K</span>
       {open && debounced.length >= 2 && (
-        <div className="card absolute right-0 z-40 mt-1 max-h-96 w-[28rem] overflow-y-auto p-1">
-          {res.isLoading && <div className="p-3 text-sm text-slate-500">Searching…</div>}
-          {res.data?.items.length === 0 && <div className="p-3 text-sm text-slate-500">No results</div>}
+        <div className="card absolute left-0 z-40 mt-2 max-h-96 w-[30rem] animate-fade-in overflow-y-auto p-1.5 shadow-lift">
+          {res.isLoading && <div className="p-3 text-sm text-ink-500">Searching…</div>}
+          {res.data?.items.length === 0 && <div className="p-3 text-sm text-ink-500">No results for “{debounced}”</div>}
           {res.data?.items.map((h) => (
-            <button key={h.type + h.id} className="block w-full rounded-md px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800" onMouseDown={() => go(h)}>
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <span className="chip bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">{h.type}</span>
+            <button key={h.type + h.id} className="block w-full rounded-lg px-3 py-2 text-left transition hover:bg-brand-50" onMouseDown={() => go(h)}>
+              <div className="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                <span className="chip bg-ink-100 uppercase tracking-wide text-ink-500">{h.type}</span>
                 {h.title}
               </div>
-              <div className="mt-0.5 line-clamp-2 text-xs text-slate-500" dangerouslySetInnerHTML={{ __html: sanitizeSnippet(h.snippet) }} />
+              <div className="mt-0.5 line-clamp-2 text-xs text-ink-500 [&_b]:font-semibold [&_b]:text-brand-700" dangerouslySetInnerHTML={{ __html: sanitizeSnippet(h.snippet) }} />
             </button>
           ))}
         </div>
@@ -185,30 +288,28 @@ function Notifications() {
   const q = useQuery({
     queryKey: ["notifications"],
     queryFn: () => api<{ items: { id: string; title: string; body: string | null; leadId: string | null; conversationId: string | null; readAt: string | null; createdAt: string }[]; unread: number }>("/api/notifications"),
-    refetchInterval: 60_000,
+    refetchInterval: 30_000,
   });
   const markAll = useMutation({ mutationFn: () => post("/api/notifications/read", {}), onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }) });
   return (
     <div className="relative">
-      <button className="btn-ghost relative" onClick={() => setOpen((x) => !x)} aria-label="Notifications">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" />
-        </svg>
-        {!!q.data?.unread && <span className="absolute -right-0.5 -top-0.5 rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">{q.data.unread > 99 ? "99+" : q.data.unread}</span>}
+      <button className="relative rounded-xl p-2.5 text-ink-500 transition hover:bg-ink-100 hover:text-ink-900" onClick={() => setOpen((x) => !x)} aria-label="Notifications">
+        <IconBell size={19} />
+        {!!q.data?.unread && <span className="absolute right-1 top-1 min-w-[18px] rounded-full bg-brand-600 px-1 text-center text-[10px] font-bold leading-[18px] text-white ring-2 ring-white">{q.data.unread > 99 ? "99+" : q.data.unread}</span>}
       </button>
       {open && (
-        <div className="card absolute right-0 z-40 mt-1 max-h-[28rem] w-80 overflow-y-auto">
-          <div className="flex items-center justify-between border-b border-slate-200 px-3 py-2 dark:border-slate-800">
-            <span className="text-sm font-semibold">Notifications</span>
-            <button className="text-xs text-brand-600" onClick={() => markAll.mutate()}>
+        <div className="card absolute right-0 z-40 mt-2 max-h-[30rem] w-96 animate-fade-in overflow-y-auto shadow-lift">
+          <div className="sticky top-0 flex items-center justify-between border-b border-ink-200 bg-white px-4 py-3">
+            <span className="section-title">Notifications</span>
+            <button className="text-xs font-semibold text-brand-600 hover:text-brand-700" onClick={() => markAll.mutate()}>
               Mark all read
             </button>
           </div>
-          {q.data?.items.length === 0 && <p className="p-4 text-sm text-slate-500">Nothing yet.</p>}
+          {q.data?.items.length === 0 && <p className="p-6 text-center text-sm text-ink-500">You're all caught up.</p>}
           {q.data?.items.map((n) => (
             <button
               key={n.id}
-              className={clsx("block w-full border-b border-slate-100 px-3 py-2 text-left hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800", !n.readAt && "bg-brand-50/60 dark:bg-brand-600/10")}
+              className={clsx("flex w-full gap-3 border-b border-ink-100 px-4 py-3 text-left transition hover:bg-ink-50", !n.readAt && "bg-brand-50/40")}
               onClick={() => {
                 setOpen(false);
                 post("/api/notifications/read", { ids: [n.id] }).then(() => qc.invalidateQueries({ queryKey: ["notifications"] }));
@@ -216,9 +317,12 @@ function Notifications() {
                 else if (n.leadId) router.push(`/leads/${n.leadId}`);
               }}
             >
-              <div className="text-sm font-medium">{n.title}</div>
-              {n.body && <div className="line-clamp-2 text-xs text-slate-500">{n.body}</div>}
-              <div className="mt-0.5 text-[11px] text-slate-400">{ago(n.createdAt)}</div>
+              <span className={clsx("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.readAt ? "bg-transparent" : "bg-brand-600")} />
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-ink-900">{n.title}</span>
+                {n.body && <span className="mt-0.5 line-clamp-2 block text-xs text-ink-500">{n.body}</span>}
+                <span className="mt-1 block text-[11px] text-ink-400">{ago(n.createdAt)}</span>
+              </span>
             </button>
           ))}
         </div>
@@ -229,33 +333,29 @@ function Notifications() {
 
 function HelpOverlay({ onClose }: { onClose: () => void }) {
   const rows: [string, string][] = [
-    ["j / k", "Next / previous conversation"],
-    ["r", "Reply (focus composer)"],
-    ["t", "Template picker"],
+    ["J / K", "Next / previous conversation"],
+    ["R", "Reply"],
+    ["T", "Template picker"],
     ["/", "Insert snippet (in composer)"],
-    ["a", "Assign to me (claim)"],
-    ["e", "Close conversation"],
-    ["n", "Internal note"],
-    ["g i / g d / g l / g p / g r", "Inbox / My day / Leads / Pipeline / Reports"],
+    ["A", "Claim lead"],
+    ["S", "Change stage"],
+    ["E", "Close conversation"],
+    ["N", "Internal note"],
+    ["G then I / D / L / P / R", "Inbox · My day · Leads · Pipeline · Reports"],
     ["⌘K", "Search"],
-    ["?", "This help"],
   ];
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={onClose}>
-      <div className="card w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
-        <h2 className="mb-3 font-semibold">Keyboard shortcuts</h2>
-        <table className="w-full text-sm">
-          <tbody>
-            {rows.map(([k, v]) => (
-              <tr key={k}>
-                <td className="py-1 pr-4">
-                  <span className="kbd">{k}</span>
-                </td>
-                <td className="py-1 text-slate-600 dark:text-slate-300">{v}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/30 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div className="card w-full max-w-md animate-fade-in p-6 shadow-lift" onClick={(e) => e.stopPropagation()}>
+        <h2 className="section-title mb-4">Keyboard shortcuts</h2>
+        <div className="space-y-2">
+          {rows.map(([k, v]) => (
+            <div key={k} className="flex items-center justify-between text-sm">
+              <span className="text-ink-600">{v}</span>
+              <span className="kbd text-[11px]">{k}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

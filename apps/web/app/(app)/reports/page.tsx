@@ -27,7 +27,7 @@ export default function ReportsPage() {
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-6xl space-y-4 p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="mr-4 text-xl font-semibold">Reports</h1>
+          <h1 className="page-title mr-4">Reports</h1>
           {TABS.filter((t) => t !== "Channel & cost" || me.data?.role !== "rep").map((t) => (
             <button key={t} className={tab === t ? "btn-primary" : "btn"} onClick={() => setTab(t)}>
               {t}
@@ -55,7 +55,7 @@ function Today() {
   const q = useQuery({ queryKey: ["report-today"], queryFn: () => api<Record<string, any>>("/api/reports/today"), refetchInterval: 30_000 });
   const speed = useQuery({ queryKey: ["report-speed", 7], queryFn: () => api<Record<string, any>>(`/api/reports/speed?from=${new Date(Date.now() - 7 * 86_400_000).toISOString()}`) });
   const d = q.data;
-  if (!d) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!d) return <p className="text-sm text-ink-500">Loading…</p>;
   const used = (d.serviceUsage as { service_count: number }[]).reduce((s, r) => s + r.service_count, 0);
   const s = speed.data;
   return (
@@ -72,31 +72,31 @@ function Today() {
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         <div className="card p-4 md:col-span-2">
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Speed to lead · last 7 days (business minutes)</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-ink-500">Speed to lead · last 7 days (business minutes)</div>
           <div className="mt-2 grid grid-cols-3 gap-4">
             <div>
               <div className={clsx("text-3xl font-semibold tabular-nums", s?.median != null && s.median > 5 ? "text-red-600" : "text-emerald-600")}>{num(s?.median, 1)}</div>
-              <div className="text-xs text-slate-500">median (target &lt; 5)</div>
+              <div className="text-xs text-ink-500">median (target &lt; 5)</div>
             </div>
             <div>
               <div className={clsx("text-3xl font-semibold tabular-nums", s?.p90 != null && s.p90 > 15 ? "text-red-600" : "text-emerald-600")}>{num(s?.p90, 1)}</div>
-              <div className="text-xs text-slate-500">p90 (target &lt; 15)</div>
+              <div className="text-xs text-ink-500">p90 (target &lt; 15)</div>
             </div>
             <div>
               <div className="text-3xl font-semibold tabular-nums">{num(s?.pct_under_5, 1)}%</div>
-              <div className="text-xs text-slate-500">answered within 5 min</div>
+              <div className="text-xs text-ink-500">answered within 5 min</div>
             </div>
           </div>
         </div>
         <div className="card p-4">
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">WhatsApp free service messages this month</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-ink-500">WhatsApp free service messages this month</div>
           <div className="mt-2 text-3xl font-semibold tabular-nums">
-            {used.toLocaleString("en-IN")} <span className="text-base text-slate-500">/ {(d.serviceAllowance * Math.max(1, d.serviceUsage.length)).toLocaleString("en-IN")}</span>
+            {used.toLocaleString("en-IN")} <span className="text-base text-ink-500">/ {(d.serviceAllowance * Math.max(1, d.serviceUsage.length)).toLocaleString("en-IN")}</span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded bg-slate-200 dark:bg-slate-800">
+          <div className="mt-2 h-2 overflow-hidden rounded bg-ink-200 dark:bg-ink-800">
             <div className={clsx("h-full", used > d.serviceAllowance * 0.8 ? "bg-amber-500" : "bg-emerald-500")} style={{ width: `${Math.min(100, (used / Math.max(1, d.serviceAllowance)) * 100)}%` }} />
           </div>
-          <div className="mt-2 text-xs text-slate-500">1,000 free per business number per month; then billed per delivered message.</div>
+          <div className="mt-2 text-xs text-ink-500">1,000 free per business number per month; then billed per delivered message.</div>
           {(d.numbers as { display_number: string; quality_rating: string | null; messaging_limit: string | null }[]).map((n) => (
             <div key={n.display_number} className="mt-2 text-xs">
               {n.display_number}: quality <b className={n.quality_rating === "GREEN" ? "text-emerald-600" : n.quality_rating ? "text-red-600" : ""}>{n.quality_rating ?? "unknown"}</b> · limit {n.messaging_limit ?? "unknown"}
@@ -137,8 +137,8 @@ function Funnel({ range }: { range: string }) {
             <div key={k} className="text-center">
               <div className="mx-auto rounded bg-brand-600" style={{ height: 8 + (64 * (total[k] ?? 0)) / Math.max(1, total.created ?? 1), width: "100%", opacity: 1 - i * 0.12 }} />
               <div className="mt-1 text-lg font-semibold tabular-nums">{total[k]}</div>
-              <div className="text-xs capitalize text-slate-500">{k}</div>
-              {i > 0 && <div className="text-[11px] text-slate-400">{pct(total[k] ?? 0, total[steps[i - 1]!] ?? 0)} of prev</div>}
+              <div className="text-xs capitalize text-ink-500">{k}</div>
+              {i > 0 && <div className="text-[11px] text-ink-400">{pct(total[k] ?? 0, total[steps[i - 1]!] ?? 0)} of prev</div>}
             </div>
           ))}
         </div>
@@ -157,14 +157,14 @@ function Funnel({ range }: { range: string }) {
               <th className="th text-right">Value won</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-ink-100 dark:divide-ink-800">
             {[...bySource.entries()].map(([src, v]) => (
               <tr key={src}>
                 <td className="td font-medium">{SOURCE_LABEL[src] ?? src}</td>
                 {steps.map((s) => (
                   <td key={s} className="td text-right tabular-nums">
                     {v[s]}
-                    {s !== "created" && <span className="ml-1 text-[11px] text-slate-400">{pct(v[s] ?? 0, v.created ?? 0)}</span>}
+                    {s !== "created" && <span className="ml-1 text-[11px] text-ink-400">{pct(v[s] ?? 0, v.created ?? 0)}</span>}
                   </td>
                 ))}
                 <td className="td text-right tabular-nums">{pct(v.won ?? 0, (v.won ?? 0) + (v.lost ?? 0))}</td>
@@ -173,7 +173,7 @@ function Funnel({ range }: { range: string }) {
             ))}
           </tbody>
         </table>
-        {rows.length === 0 && <p className="p-6 text-center text-sm text-slate-500">No data yet (views refresh every 5 minutes).</p>}
+        {rows.length === 0 && <p className="p-6 text-center text-sm text-ink-500">No data yet (views refresh every 5 minutes).</p>}
       </div>
     </div>
   );
@@ -193,7 +193,7 @@ function Team({ range }: { range: string }) {
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+        <tbody className="divide-y divide-ink-100 dark:divide-ink-800">
           {q.data?.rows.map((r) => (
             <tr key={r.user_id}>
               <td className="td font-medium">{r.name}</td>
@@ -216,7 +216,7 @@ function Team({ range }: { range: string }) {
 function Cost({ range }: { range: string }) {
   const q = useQuery({ queryKey: ["report-cost", range], queryFn: () => api<{ byCategory: Record<string, any>[]; templatePerf: Record<string, any>[]; unit: Record<string, any>; email: Record<string, any> }>(`/api/reports/cost?${range}`) });
   const d = q.data;
-  if (!d) return <p className="text-sm text-slate-500">Loading…</p>;
+  if (!d) return <p className="text-sm text-ink-500">Loading…</p>;
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
@@ -227,7 +227,7 @@ function Cost({ range }: { range: string }) {
         <Stat label="Email bounce rate" value={`${num(d.email?.bounce_rate, 2)}%`} hint={`${d.email?.hard_bounces ?? 0} hard · ${d.email?.soft_bounces ?? 0} soft`} tone={Number(d.email?.bounce_rate) > 2 ? "bad" : undefined} />
       </div>
       <div className="card overflow-x-auto">
-        <div className="border-b border-slate-200 p-3 text-sm font-semibold dark:border-slate-800">WhatsApp messages by category</div>
+        <div className="border-b border-ink-200 p-3 text-sm font-semibold dark:border-ink-800">WhatsApp messages by category</div>
         <table className="min-w-full">
           <thead>
             <tr>
@@ -238,7 +238,7 @@ function Cost({ range }: { range: string }) {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-ink-100 dark:divide-ink-800">
             {d.byCategory.map((r, i) => (
               <tr key={i}>
                 <td className="td">{String(r.month).slice(0, 7)}</td>
@@ -253,7 +253,7 @@ function Cost({ range }: { range: string }) {
         </table>
       </div>
       <div className="card overflow-x-auto">
-        <div className="border-b border-slate-200 p-3 text-sm font-semibold dark:border-slate-800">Template performance</div>
+        <div className="border-b border-ink-200 p-3 text-sm font-semibold dark:border-ink-800">Template performance</div>
         <table className="min-w-full">
           <thead>
             <tr>
@@ -264,7 +264,7 @@ function Cost({ range }: { range: string }) {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+          <tbody className="divide-y divide-ink-100 dark:divide-ink-800">
             {d.templatePerf.map((r) => (
               <tr key={r.template_id}>
                 <td className="td font-medium">{r.internal_name}</td>

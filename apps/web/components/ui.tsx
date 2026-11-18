@@ -55,12 +55,12 @@ export function Modal({ title, onClose, children, wide }: { title: string; onClo
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/30 p-4 pt-16" onMouseDown={onClose}>
-      <div className={clsx("card w-full p-5", wide ? "max-w-3xl" : "max-w-md")} onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-label={title}>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-semibold">{title}</h2>
-          <button className="btn-ghost" onClick={onClose} aria-label="Close">
-            ✕
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-900/30 p-4 pt-20 backdrop-blur-sm" onMouseDown={onClose}>
+      <div className={clsx("card w-full animate-fade-in p-6 shadow-lift", wide ? "max-w-3xl" : "max-w-md")} onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-label={title}>
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="font-display text-lg font-bold text-ink-900">{title}</h2>
+          <button className="rounded-lg p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-900" onClick={onClose} aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
           </button>
         </div>
         {children}
@@ -69,16 +69,37 @@ export function Modal({ title, onClose, children, wide }: { title: string; onClo
   );
 }
 
-export function Empty({ children }: { children: ReactNode }) {
-  return <div className="flex h-full items-center justify-center p-8 text-center text-sm text-slate-500">{children}</div>;
+export function Empty({ children, title }: { children?: ReactNode; title?: string }) {
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-3 p-10 text-center">
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 ring-8 ring-brand-50/50">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg>
+      </span>
+      {title && <div className="font-display text-base font-bold text-ink-900">{title}</div>}
+      {children && <div className="max-w-sm text-sm text-ink-500">{children}</div>}
+    </div>
+  );
+}
+
+export function PageHeader({ title, subtitle, children }: { title: string; subtitle?: string; children?: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h1 className="page-title">{title}</h1>
+        {subtitle && <p className="mt-1 text-sm text-ink-500">{subtitle}</p>}
+      </div>
+      {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
+    </div>
+  );
 }
 
 export function Stat({ label, value, hint, tone }: { label: string; value: ReactNode; hint?: string; tone?: "bad" | "good" | "warn" }) {
   return (
-    <div className="card p-4">
-      <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</div>
-      <div className={clsx("mt-1 text-2xl font-semibold tabular-nums", tone === "bad" && "text-red-600", tone === "warn" && "text-amber-600", tone === "good" && "text-emerald-600")}>{value}</div>
-      {hint && <div className="mt-0.5 text-xs text-slate-500">{hint}</div>}
+    <div className="card relative overflow-hidden p-5">
+      <span className={clsx("absolute inset-x-0 top-0 h-1", tone === "bad" ? "bg-brand-600" : tone === "warn" ? "bg-amber-400" : tone === "good" ? "bg-emerald-500" : "bg-ink-200")} />
+      <div className="text-[11px] font-bold uppercase tracking-[0.12em] text-ink-500">{label}</div>
+      <div className={clsx("mt-2 font-display text-3xl font-bold tabular-nums tracking-tight", tone === "bad" ? "text-brand-600" : tone === "warn" ? "text-amber-600" : tone === "good" ? "text-emerald-600" : "text-ink-900")}>{value}</div>
+      {hint && <div className="mt-1 text-xs text-ink-500">{hint}</div>}
     </div>
   );
 }
