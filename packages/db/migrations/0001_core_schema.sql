@@ -1,4 +1,4 @@
-CREATE TABLE "activities" (
+CREATE TABLE "los_activities" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"lead_id" uuid NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE "activities" (
 	"occurred_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "api_tokens" (
+CREATE TABLE "los_api_tokens" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE "api_tokens" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "attachments" (
+CREATE TABLE "los_attachments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"owner_type" text NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE "attachments" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "audit_log" (
+CREATE TABLE "los_audit_log" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"actor_id" uuid,
@@ -51,7 +51,7 @@ CREATE TABLE "audit_log" (
 	"at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "broadcast_recipients" (
+CREATE TABLE "los_broadcast_recipients" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"broadcast_id" uuid NOT NULL,
 	"contact_id" uuid NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE "broadcast_recipients" (
 	"skip_reason" text
 );
 --> statement-breakpoint
-CREATE TABLE "broadcasts" (
+CREATE TABLE "los_broadcasts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"name" text NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE "broadcasts" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "business_hours" (
+CREATE TABLE "los_business_hours" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"name" text NOT NULL,
@@ -88,7 +88,7 @@ CREATE TABLE "business_hours" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "channel_identities" (
+CREATE TABLE "los_channel_identities" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"contact_id" uuid NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE "channel_identities" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "companies" (
+CREATE TABLE "los_companies" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"name" text NOT NULL,
@@ -118,7 +118,7 @@ CREATE TABLE "companies" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "consent_records" (
+CREATE TABLE "los_consent_records" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"contact_id" uuid NOT NULL,
@@ -133,7 +133,7 @@ CREATE TABLE "consent_records" (
 	"captured_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "contacts" (
+CREATE TABLE "los_contacts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"company_id" uuid,
@@ -154,7 +154,7 @@ CREATE TABLE "contacts" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "conversations" (
+CREATE TABLE "los_conversations" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"lead_id" uuid NOT NULL,
@@ -181,7 +181,7 @@ CREATE TABLE "conversations" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "data_rights_requests" (
+CREATE TABLE "los_data_rights_requests" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"contact_id" uuid,
@@ -197,7 +197,7 @@ CREATE TABLE "data_rights_requests" (
 	"resolution" text
 );
 --> statement-breakpoint
-CREATE TABLE "duplicate_suggestions" (
+CREATE TABLE "los_duplicate_suggestions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"contact_a" uuid NOT NULL,
@@ -209,7 +209,7 @@ CREATE TABLE "duplicate_suggestions" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "enrichment_results" (
+CREATE TABLE "los_enrichment_results" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"contact_id" uuid,
@@ -220,7 +220,7 @@ CREATE TABLE "enrichment_results" (
 	"fetched_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "enrollment_events" (
+CREATE TABLE "los_enrollment_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"enrollment_id" uuid NOT NULL,
 	"lead_id" uuid NOT NULL,
@@ -231,7 +231,7 @@ CREATE TABLE "enrollment_events" (
 	"occurred_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "enrollments" (
+CREATE TABLE "los_enrollments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"lead_id" uuid NOT NULL,
@@ -245,11 +245,11 @@ CREATE TABLE "enrollments" (
 	"ended_at" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE "free_email_domains" (
+CREATE TABLE "los_free_email_domains" (
 	"domain" text PRIMARY KEY NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "holidays" (
+CREATE TABLE "los_holidays" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"business_hours_id" uuid,
@@ -257,7 +257,7 @@ CREATE TABLE "holidays" (
 	"name" text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "lead_sources" (
+CREATE TABLE "los_lead_sources" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"key" text NOT NULL,
@@ -265,7 +265,7 @@ CREATE TABLE "lead_sources" (
 	"active" boolean DEFAULT true NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "leads" (
+CREATE TABLE "los_leads" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"number" bigserial NOT NULL,
@@ -308,7 +308,7 @@ CREATE TABLE "leads" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "lost_reasons" (
+CREATE TABLE "los_lost_reasons" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"key" text NOT NULL,
@@ -316,7 +316,7 @@ CREATE TABLE "lost_reasons" (
 	"active" boolean DEFAULT true NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "mailbox_connections" (
+CREATE TABLE "los_mailbox_connections" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"user_id" uuid,
@@ -332,7 +332,7 @@ CREATE TABLE "mailbox_connections" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "messages" (
+CREATE TABLE "los_messages" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"conversation_id" uuid NOT NULL,
@@ -379,7 +379,7 @@ CREATE TABLE "messages" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "notes" (
+CREATE TABLE "los_notes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"lead_id" uuid NOT NULL,
@@ -391,7 +391,7 @@ CREATE TABLE "notes" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "notice_versions" (
+CREATE TABLE "los_notice_versions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"version" text NOT NULL,
@@ -399,7 +399,7 @@ CREATE TABLE "notice_versions" (
 	"published_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "notifications" (
+CREATE TABLE "los_notifications" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -412,14 +412,14 @@ CREATE TABLE "notifications" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "orgs" (
+CREATE TABLE "los_orgs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"settings" jsonb DEFAULT '{}'::jsonb NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "parse_failures" (
+CREATE TABLE "los_parse_failures" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"lead_id" uuid,
@@ -432,7 +432,7 @@ CREATE TABLE "parse_failures" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "rate_card" (
+CREATE TABLE "los_rate_card" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"country" text NOT NULL,
 	"category" text NOT NULL,
@@ -441,7 +441,7 @@ CREATE TABLE "rate_card" (
 	"effective_from" date NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "routing_rules" (
+CREATE TABLE "los_routing_rules" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"name" text NOT NULL,
@@ -455,7 +455,7 @@ CREATE TABLE "routing_rules" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "sequence_steps" (
+CREATE TABLE "los_sequence_steps" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"sequence_id" uuid NOT NULL,
 	"position" integer NOT NULL,
@@ -472,7 +472,7 @@ CREATE TABLE "sequence_steps" (
 	"requires_human" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "sequences" (
+CREATE TABLE "los_sequences" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"name" text NOT NULL,
@@ -482,7 +482,7 @@ CREATE TABLE "sequences" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "sessions" (
+CREATE TABLE "los_sessions" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" uuid NOT NULL,
 	"pending_totp" boolean DEFAULT false NOT NULL,
@@ -492,7 +492,7 @@ CREATE TABLE "sessions" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "sla_breaches" (
+CREATE TABLE "los_sla_breaches" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"timer_id" uuid NOT NULL,
@@ -503,7 +503,7 @@ CREATE TABLE "sla_breaches" (
 	"occurred_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "sla_policies" (
+CREATE TABLE "los_sla_policies" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"kind" text NOT NULL,
@@ -512,7 +512,7 @@ CREATE TABLE "sla_policies" (
 	"active" boolean DEFAULT true NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "sla_timers" (
+CREATE TABLE "los_sla_timers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"lead_id" uuid NOT NULL,
@@ -533,7 +533,7 @@ CREATE TABLE "sla_timers" (
 	"stopped_at" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE "snippets" (
+CREATE TABLE "los_snippets" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"folder" text DEFAULT 'General' NOT NULL,
@@ -545,7 +545,7 @@ CREATE TABLE "snippets" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "tasks" (
+CREATE TABLE "los_tasks" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"lead_id" uuid,
@@ -558,7 +558,7 @@ CREATE TABLE "tasks" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "teams" (
+CREATE TABLE "los_teams" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"name" text NOT NULL,
@@ -566,7 +566,7 @@ CREATE TABLE "teams" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "templates" (
+CREATE TABLE "los_templates" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"channel" text DEFAULT 'whatsapp' NOT NULL,
@@ -589,7 +589,7 @@ CREATE TABLE "templates" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "users" (
+CREATE TABLE "los_users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"name" text NOT NULL,
@@ -612,7 +612,7 @@ CREATE TABLE "users" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "wa_numbers" (
+CREATE TABLE "los_wa_numbers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"org_id" uuid NOT NULL,
 	"phone_number_id" text NOT NULL,
@@ -624,7 +624,7 @@ CREATE TABLE "wa_numbers" (
 	"last_synced_at" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE "webhook_events" (
+CREATE TABLE "los_webhook_events" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"provider" text NOT NULL,
 	"external_id" text NOT NULL,
@@ -637,56 +637,56 @@ CREATE TABLE "webhook_events" (
 	"error" text
 );
 --> statement-breakpoint
-CREATE INDEX "activities_lead_idx" ON "activities" USING btree ("lead_id","occurred_at");--> statement-breakpoint
-CREATE INDEX "activities_type_idx" ON "activities" USING btree ("org_id","type","occurred_at");--> statement-breakpoint
-CREATE INDEX "attachments_owner_idx" ON "attachments" USING btree ("owner_type","owner_id");--> statement-breakpoint
-CREATE INDEX "audit_entity_idx" ON "audit_log" USING btree ("entity","entity_id");--> statement-breakpoint
-CREATE INDEX "audit_at_idx" ON "audit_log" USING btree ("at");--> statement-breakpoint
-CREATE UNIQUE INDEX "broadcast_recipient_uq" ON "broadcast_recipients" USING btree ("broadcast_id","contact_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "channel_identities_uq" ON "channel_identities" USING btree ("org_id","kind","value_normalised");--> statement-breakpoint
-CREATE INDEX "channel_identities_contact_idx" ON "channel_identities" USING btree ("contact_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "companies_org_domain_uq" ON "companies" USING btree ("org_id","domain") WHERE "companies"."domain" is not null;--> statement-breakpoint
-CREATE INDEX "companies_name_trgm" ON "companies" USING gin ("name" gin_trgm_ops);--> statement-breakpoint
-CREATE INDEX "consent_contact_idx" ON "consent_records" USING btree ("contact_id","channel","captured_at");--> statement-breakpoint
-CREATE INDEX "contacts_company_idx" ON "contacts" USING btree ("company_id");--> statement-breakpoint
-CREATE INDEX "contacts_name_trgm" ON "contacts" USING gin ((coalesce("display_name", '') || ' ' || coalesce("first_name", '') || ' ' || coalesce("last_name", '')) gin_trgm_ops);--> statement-breakpoint
-CREATE INDEX "conversations_lead_idx" ON "conversations" USING btree ("lead_id");--> statement-breakpoint
-CREATE INDEX "conversations_inbox_idx" ON "conversations" USING btree ("org_id","state","last_message_at");--> statement-breakpoint
-CREATE INDEX "conversations_assigned_idx" ON "conversations" USING btree ("assigned_to","last_message_at");--> statement-breakpoint
-CREATE INDEX "conversations_window_idx" ON "conversations" USING btree ("window_expires_at") WHERE "conversations"."window_expires_at" is not null;--> statement-breakpoint
-CREATE UNIQUE INDEX "duplicate_pair_uq" ON "duplicate_suggestions" USING btree ("contact_a","contact_b");--> statement-breakpoint
-CREATE INDEX "enrollment_events_enr_idx" ON "enrollment_events" USING btree ("enrollment_id");--> statement-breakpoint
-CREATE INDEX "enrollments_due_idx" ON "enrollments" USING btree ("next_run_at") WHERE "enrollments"."state" = 'active';--> statement-breakpoint
-CREATE UNIQUE INDEX "enrollments_active_uq" ON "enrollments" USING btree ("lead_id","sequence_id") WHERE "enrollments"."state" = 'active';--> statement-breakpoint
-CREATE INDEX "holidays_org_day_idx" ON "holidays" USING btree ("org_id","day");--> statement-breakpoint
-CREATE UNIQUE INDEX "lead_sources_key_uq" ON "lead_sources" USING btree ("org_id","key");--> statement-breakpoint
-CREATE INDEX "leads_open_contact_idx" ON "leads" USING btree ("contact_id") WHERE "leads"."closed_at" is null;--> statement-breakpoint
-CREATE INDEX "leads_owner_stage_idx" ON "leads" USING btree ("owner_id","stage");--> statement-breakpoint
-CREATE INDEX "leads_stage_idx" ON "leads" USING btree ("org_id","stage");--> statement-breakpoint
-CREATE INDEX "leads_created_idx" ON "leads" USING btree ("org_id","created_at");--> statement-breakpoint
-CREATE UNIQUE INDEX "leads_portal_uq" ON "leads" USING btree ("org_id","source","portal_lead_id") WHERE "leads"."portal_lead_id" is not null;--> statement-breakpoint
-CREATE UNIQUE INDEX "lost_reasons_key_uq" ON "lost_reasons" USING btree ("org_id","key");--> statement-breakpoint
-CREATE UNIQUE INDEX "mailbox_connections_email_uq" ON "mailbox_connections" USING btree ("email");--> statement-breakpoint
-CREATE UNIQUE INDEX "messages_provider_uq" ON "messages" USING btree ("channel","provider_message_id") WHERE "messages"."provider_message_id" is not null;--> statement-breakpoint
-CREATE UNIQUE INDEX "messages_idem_uq" ON "messages" USING btree ("idempotency_key") WHERE "messages"."idempotency_key" is not null;--> statement-breakpoint
-CREATE INDEX "messages_conversation_idx" ON "messages" USING btree ("conversation_id","created_at");--> statement-breakpoint
-CREATE INDEX "messages_email_mid_idx" ON "messages" USING btree ("email_message_id") WHERE "messages"."email_message_id" is not null;--> statement-breakpoint
-CREATE INDEX "messages_search_idx" ON "messages" USING gin ("search");--> statement-breakpoint
-CREATE INDEX "messages_status_idx" ON "messages" USING btree ("status") WHERE "messages"."status" in ('queued','sending');--> statement-breakpoint
-CREATE INDEX "notes_lead_idx" ON "notes" USING btree ("lead_id");--> statement-breakpoint
-CREATE INDEX "notes_search_idx" ON "notes" USING gin ("search");--> statement-breakpoint
-CREATE UNIQUE INDEX "notice_versions_uq" ON "notice_versions" USING btree ("org_id","version");--> statement-breakpoint
-CREATE INDEX "notifications_user_idx" ON "notifications" USING btree ("user_id","created_at");--> statement-breakpoint
-CREATE UNIQUE INDEX "rate_card_uq" ON "rate_card" USING btree ("country","category","effective_from");--> statement-breakpoint
-CREATE UNIQUE INDEX "sequence_steps_pos_uq" ON "sequence_steps" USING btree ("sequence_id","position");--> statement-breakpoint
-CREATE INDEX "sessions_user_idx" ON "sessions" USING btree ("user_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "sla_breaches_uq" ON "sla_breaches" USING btree ("timer_id","level");--> statement-breakpoint
-CREATE INDEX "sla_timers_running_idx" ON "sla_timers" USING btree ("state","warn_at") WHERE "sla_timers"."state" = 'running';--> statement-breakpoint
-CREATE INDEX "sla_timers_lead_idx" ON "sla_timers" USING btree ("lead_id");--> statement-breakpoint
-CREATE INDEX "tasks_assignee_open_idx" ON "tasks" USING btree ("assignee_id","due_at") WHERE "tasks"."completed_at" is null;--> statement-breakpoint
-CREATE INDEX "tasks_lead_idx" ON "tasks" USING btree ("lead_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "templates_provider_uq" ON "templates" USING btree ("org_id","channel","provider_name","language");--> statement-breakpoint
-CREATE UNIQUE INDEX "users_email_uq" ON "users" USING btree ("email");--> statement-breakpoint
-CREATE UNIQUE INDEX "wa_numbers_pnid_uq" ON "wa_numbers" USING btree ("phone_number_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "webhook_events_uq" ON "webhook_events" USING btree ("provider","external_id");--> statement-breakpoint
-CREATE INDEX "webhook_events_unprocessed_idx" ON "webhook_events" USING btree ("received_at") WHERE "webhook_events"."processed_at" is null;
+CREATE INDEX "los_activities_lead_idx" ON "los_activities" USING btree ("lead_id","occurred_at");--> statement-breakpoint
+CREATE INDEX "los_activities_type_idx" ON "los_activities" USING btree ("org_id","type","occurred_at");--> statement-breakpoint
+CREATE INDEX "los_attachments_owner_idx" ON "los_attachments" USING btree ("owner_type","owner_id");--> statement-breakpoint
+CREATE INDEX "los_audit_entity_idx" ON "los_audit_log" USING btree ("entity","entity_id");--> statement-breakpoint
+CREATE INDEX "los_audit_at_idx" ON "los_audit_log" USING btree ("at");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_broadcast_recipient_uq" ON "los_broadcast_recipients" USING btree ("broadcast_id","contact_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_channel_identities_uq" ON "los_channel_identities" USING btree ("org_id","kind","value_normalised");--> statement-breakpoint
+CREATE INDEX "los_channel_identities_contact_idx" ON "los_channel_identities" USING btree ("contact_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_companies_org_domain_uq" ON "los_companies" USING btree ("org_id","domain") WHERE "los_companies"."domain" is not null;--> statement-breakpoint
+CREATE INDEX "los_companies_name_trgm" ON "los_companies" USING gin ("name" gin_trgm_ops);--> statement-breakpoint
+CREATE INDEX "los_consent_contact_idx" ON "los_consent_records" USING btree ("contact_id","channel","captured_at");--> statement-breakpoint
+CREATE INDEX "los_contacts_company_idx" ON "los_contacts" USING btree ("company_id");--> statement-breakpoint
+CREATE INDEX "los_contacts_name_trgm" ON "los_contacts" USING gin ((coalesce("display_name", '') || ' ' || coalesce("first_name", '') || ' ' || coalesce("last_name", '')) gin_trgm_ops);--> statement-breakpoint
+CREATE INDEX "los_conversations_lead_idx" ON "los_conversations" USING btree ("lead_id");--> statement-breakpoint
+CREATE INDEX "los_conversations_inbox_idx" ON "los_conversations" USING btree ("org_id","state","last_message_at");--> statement-breakpoint
+CREATE INDEX "los_conversations_assigned_idx" ON "los_conversations" USING btree ("assigned_to","last_message_at");--> statement-breakpoint
+CREATE INDEX "los_conversations_window_idx" ON "los_conversations" USING btree ("window_expires_at") WHERE "los_conversations"."window_expires_at" is not null;--> statement-breakpoint
+CREATE UNIQUE INDEX "los_duplicate_pair_uq" ON "los_duplicate_suggestions" USING btree ("contact_a","contact_b");--> statement-breakpoint
+CREATE INDEX "los_enrollment_events_enr_idx" ON "los_enrollment_events" USING btree ("enrollment_id");--> statement-breakpoint
+CREATE INDEX "los_enrollments_due_idx" ON "los_enrollments" USING btree ("next_run_at") WHERE "los_enrollments"."state" = 'active';--> statement-breakpoint
+CREATE UNIQUE INDEX "los_enrollments_active_uq" ON "los_enrollments" USING btree ("lead_id","sequence_id") WHERE "los_enrollments"."state" = 'active';--> statement-breakpoint
+CREATE INDEX "los_holidays_org_day_idx" ON "los_holidays" USING btree ("org_id","day");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_lead_sources_key_uq" ON "los_lead_sources" USING btree ("org_id","key");--> statement-breakpoint
+CREATE INDEX "los_leads_open_contact_idx" ON "los_leads" USING btree ("contact_id") WHERE "los_leads"."closed_at" is null;--> statement-breakpoint
+CREATE INDEX "los_leads_owner_stage_idx" ON "los_leads" USING btree ("owner_id","stage");--> statement-breakpoint
+CREATE INDEX "los_leads_stage_idx" ON "los_leads" USING btree ("org_id","stage");--> statement-breakpoint
+CREATE INDEX "los_leads_created_idx" ON "los_leads" USING btree ("org_id","created_at");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_leads_portal_uq" ON "los_leads" USING btree ("org_id","source","portal_lead_id") WHERE "los_leads"."portal_lead_id" is not null;--> statement-breakpoint
+CREATE UNIQUE INDEX "los_lost_reasons_key_uq" ON "los_lost_reasons" USING btree ("org_id","key");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_mailbox_connections_email_uq" ON "los_mailbox_connections" USING btree ("email");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_messages_provider_uq" ON "los_messages" USING btree ("channel","provider_message_id") WHERE "los_messages"."provider_message_id" is not null;--> statement-breakpoint
+CREATE UNIQUE INDEX "los_messages_idem_uq" ON "los_messages" USING btree ("idempotency_key") WHERE "los_messages"."idempotency_key" is not null;--> statement-breakpoint
+CREATE INDEX "los_messages_conversation_idx" ON "los_messages" USING btree ("conversation_id","created_at");--> statement-breakpoint
+CREATE INDEX "los_messages_email_mid_idx" ON "los_messages" USING btree ("email_message_id") WHERE "los_messages"."email_message_id" is not null;--> statement-breakpoint
+CREATE INDEX "los_messages_search_idx" ON "los_messages" USING gin ("search");--> statement-breakpoint
+CREATE INDEX "los_messages_status_idx" ON "los_messages" USING btree ("status") WHERE "los_messages"."status" in ('queued','sending');--> statement-breakpoint
+CREATE INDEX "los_notes_lead_idx" ON "los_notes" USING btree ("lead_id");--> statement-breakpoint
+CREATE INDEX "los_notes_search_idx" ON "los_notes" USING gin ("search");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_notice_versions_uq" ON "los_notice_versions" USING btree ("org_id","version");--> statement-breakpoint
+CREATE INDEX "los_notifications_user_idx" ON "los_notifications" USING btree ("user_id","created_at");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_rate_card_uq" ON "los_rate_card" USING btree ("country","category","effective_from");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_sequence_steps_pos_uq" ON "los_sequence_steps" USING btree ("sequence_id","position");--> statement-breakpoint
+CREATE INDEX "los_sessions_user_idx" ON "los_sessions" USING btree ("user_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_sla_breaches_uq" ON "los_sla_breaches" USING btree ("timer_id","level");--> statement-breakpoint
+CREATE INDEX "los_sla_timers_running_idx" ON "los_sla_timers" USING btree ("state","warn_at") WHERE "los_sla_timers"."state" = 'running';--> statement-breakpoint
+CREATE INDEX "los_sla_timers_lead_idx" ON "los_sla_timers" USING btree ("lead_id");--> statement-breakpoint
+CREATE INDEX "los_tasks_assignee_open_idx" ON "los_tasks" USING btree ("assignee_id","due_at") WHERE "los_tasks"."completed_at" is null;--> statement-breakpoint
+CREATE INDEX "los_tasks_lead_idx" ON "los_tasks" USING btree ("lead_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_templates_provider_uq" ON "los_templates" USING btree ("org_id","channel","provider_name","language");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_users_email_uq" ON "los_users" USING btree ("email");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_wa_numbers_pnid_uq" ON "los_wa_numbers" USING btree ("phone_number_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "los_webhook_events_uq" ON "los_webhook_events" USING btree ("provider","external_id");--> statement-breakpoint
+CREATE INDEX "los_webhook_events_unprocessed_idx" ON "los_webhook_events" USING btree ("received_at") WHERE "los_webhook_events"."processed_at" is null;

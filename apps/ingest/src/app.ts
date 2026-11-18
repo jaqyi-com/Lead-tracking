@@ -162,7 +162,7 @@ export async function buildIngest(opts: { enqueue: Enqueue; healthCheck?: () => 
     if (!contactId) return false;
     await withTx(async (tx) => {
       await withdrawConsent(tx, contactId, "email", "unsubscribe_link", { via, at: new Date().toISOString() });
-      const r = await tx.execute(sql`select id from leads where contact_id = ${contactId} order by opened_at desc limit 1`);
+      const r = await tx.execute(sql`select id from los_leads where contact_id = ${contactId} order by opened_at desc limit 1`);
       const leadId = (r.rows[0] as { id?: string } | undefined)?.id;
       if (leadId) await logActivity(tx, leadId, "opted_out", { type: "contact", id: contactId }, { channel: "email", via });
     });

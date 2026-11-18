@@ -229,7 +229,7 @@ export async function seedBase(db: Db): Promise<void> {
     .values(LOST_REASONS.map(([key, label]) => ({ orgId, key, label })))
     .onConflictDoNothing();
 
-  const [{ n: slaCount }] = (await db.execute(sql`select count(*)::int as n from sla_policies`)).rows as { n: number }[];
+  const [{ n: slaCount }] = (await db.execute(sql`select count(*)::int as n from los_sla_policies`)).rows as { n: number }[];
   if (!slaCount) {
     // §3.2 SLA column. Minutes are business minutes (1 working day = 540).
     await db.insert(s.slaPolicies).values([
@@ -242,7 +242,7 @@ export async function seedBase(db: Db): Promise<void> {
     ]);
   }
 
-  const [{ n: ruleCount }] = (await db.execute(sql`select count(*)::int as n from routing_rules`)).rows as { n: number }[];
+  const [{ n: ruleCount }] = (await db.execute(sql`select count(*)::int as n from los_routing_rules`)).rows as { n: number }[];
   if (!ruleCount) {
     await db.insert(s.routingRules).values({
       orgId,
@@ -273,7 +273,7 @@ export async function seedBase(db: Db): Promise<void> {
     )
     .onConflictDoNothing();
 
-  const [{ n: snippetCount }] = (await db.execute(sql`select count(*)::int as n from snippets`)).rows as { n: number }[];
+  const [{ n: snippetCount }] = (await db.execute(sql`select count(*)::int as n from los_snippets`)).rows as { n: number }[];
   if (!snippetCount) await db.insert(s.snippets).values(SNIPPETS.map((x) => ({ ...x, orgId })));
 
   await db

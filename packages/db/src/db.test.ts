@@ -7,9 +7,9 @@ describe("migrations + seed", () => {
     const { db, client } = await createTestDb();
     const { seedBase } = await import("./seed-data");
     await seedBase(db);
-    const r = await db.execute(sql`select count(*)::int as n from lead_sources`);
+    const r = await db.execute(sql`select count(*)::int as n from los_lead_sources`);
     expect((r.rows[0] as { n: number }).n).toBeGreaterThan(5);
-    const t = await db.execute(sql`select count(*)::int as n from templates`);
+    const t = await db.execute(sql`select count(*)::int as n from los_templates`);
     expect((t.rows[0] as { n: number }).n).toBe(10);
     await client.close();
   });

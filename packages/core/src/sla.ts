@@ -105,7 +105,7 @@ export async function retargetTimers(tx: Db, leadId: string, ownerId: string): P
 /** Process a timer: record due levels, notify, escalate. Idempotent (unique timer+level). */
 export async function processTimer(timerId: string, now: Date = new Date()): Promise<SlaLevel[]> {
   return withTx(async (tx, fx) => {
-    const rows = await tx.execute(sql`select id from sla_timers where id = ${timerId} for update`);
+    const rows = await tx.execute(sql`select id from los_sla_timers where id = ${timerId} for update`);
     if (!rows.rows.length) return [];
     const [timer] = await tx.select().from(slaTimers).where(eq(slaTimers.id, timerId));
     if (!timer || timer.state !== "running") return [];

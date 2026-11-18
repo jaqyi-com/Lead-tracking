@@ -68,8 +68,8 @@ while (Date.now() < deadline) {
   const r = await db.execute(sql`
     select m.marker, count(distinct msg.lead_id)::int as leads, count(distinct l.id) filter (where l.owner_id is not null)::int as owned
     from unnest(${`{${markers.join(",")}}`}::text[]) as m(marker)
-    left join messages msg on msg.direction = 'inbound' and (msg.body like '%' || m.marker || '%' or msg.subject like '%' || m.marker || '%')
-    left join leads l on l.id = msg.lead_id
+    left join los_messages msg on msg.direction = 'inbound' and (msg.body like '%' || m.marker || '%' or msg.subject like '%' || m.marker || '%')
+    left join los_leads l on l.id = msg.lead_id
     group by m.marker`);
   found = r.rows as typeof found;
   if (found.every((f) => f.leads === 1 && f.owned === 1)) break;

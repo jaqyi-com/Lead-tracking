@@ -141,7 +141,7 @@ describe("WhatsApp capture → lead with owner (Phase 1 done-criterion)", () => 
 
   it("is idempotent on duplicate deliveries", async () => {
     await processWhatsAppPayload(waPayload("919876543210", "wamid.A1", "Hi, need HR data for Pune. Price?"));
-    const n = await q<{ n: number }>(sql`select count(*)::int as n from messages where provider_message_id = 'wamid.A1'`);
+    const n = await q<{ n: number }>(sql`select count(*)::int as n from los_messages where provider_message_id = 'wamid.A1'`);
     expect(n[0]!.n).toBe(1);
   });
 
@@ -151,15 +151,15 @@ describe("WhatsApp capture → lead with owner (Phase 1 done-criterion)", () => 
       processWhatsAppPayload(waPayload("919811111111", "wamid.B2", "need data")),
     ]);
     const leads = await q<{ n: number; owners: number }>(sql`
-      select count(*)::int as n, count(distinct owner_id)::int as owners from leads l
-      join channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919811111111'`);
+      select count(*)::int as n, count(distinct owner_id)::int as owners from los_leads l
+      join los_channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919811111111'`);
     expect(leads[0]).toEqual({ n: 1, owners: 1 });
   });
 
   it("human reply stamps first response and stops SLA; window rules are enforced server-side", async () => {
     const [lead] = await q<{ id: string; conv: string }>(sql`
-      select l.id, c.id as conv from leads l join conversations c on c.lead_id = l.id
-      join channel_identities ci on ci.contact_id = l.contact_id and ci.value_normalised = '919876543210' limit 1`);
+      select l.id, c.id as conv from los_leads l join los_conversations c on c.lead_id = l.id
+      join los_channel_identities ci on ci.contact_id = l.contact_id and ci.value_normalised = '919876543210' limit 1`);
     await withTx((tx, fx) =>
       queueMessage(tx, fx, { conversationId: lead!.conv, actor: { type: "user", id: repA }, type: "text", body: "Hi Rahul, Priya here. What volume?" }),
     );
@@ -184,7 +184,7 @@ describe("WhatsApp capture → lead with owner (Phase 1 done-criterion)", () => 
   });
 
   it("refuses unapproved templates and marketing without opt-in", async () => {
-    const [conv] = await q<{ id: string }>(sql`select c.id from conversations c join channel_identities ci on ci.contact_id = c.contact_id and ci.value_normalised = '919876543210' where c.channel = 'whatsapp' limit 1`);
+    const [conv] = await q<{ id: string }>(sql`select c.id from los_conversations c join los_channel_identities ci on ci.contact_id = c.contact_id and ci.value_normalised = '919876543210' where c.channel = 'whatsapp' limit 1`);
     const [mkt] = await db.select().from(s.templates).where(eq(s.templates.internalName, "reengagement_offer"));
     await expect(
       withTx((tx, fx) => queueMessage(tx, fx, { conversationId: conv!.id, actor: { type: "user", id: repA }, type: "template", templateId: mkt!.id, templateValues: { "2": "Gujarat" } })),
@@ -198,7 +198,7 @@ describe("WhatsApp capture → lead with owner (Phase 1 done-criterion)", () => 
   });
 
   it("applies delivered/read status webhooks and pricing", async () => {
-    const [m] = await q<{ provider_message_id: string; id: string }>(sql`select id, provider_message_id from messages where direction = 'outbound' and provider_message_id is not null limit 1`);
+    const [m] = await q<{ provider_message_id: string; id: string }>(sql`select id, provider_message_id from los_messages where direction = 'outbound' and provider_message_id is not null limit 1`);
     await processWhatsAppPayload({
       entry: [{ id: "W", changes: [{ field: "messages", value: { statuses: [{ id: m!.provider_message_id, status: "read", timestamp: String(Math.floor(Date.now() / 1000)), pricing: { billable: true, category: "service" } }] } }] }],
     });
@@ -210,7 +210,7 @@ describe("WhatsApp capture → lead with owner (Phase 1 done-criterion)", () => 
 
   it("client reply moves Attempting → Engaged and stops the cadence", async () => {
     await processWhatsAppPayload(waPayload("919876543210", "wamid.A2", "About 5000 records per month"));
-    const [l] = await q<{ stage: string; id: string }>(sql`select l.stage, l.id from leads l join channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919876543210'`);
+    const [l] = await q<{ stage: string; id: string }>(sql`select l.stage, l.id from los_leads l join los_channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919876543210'`);
     expect(l!.stage).toBe("engaged");
     const enr = await db.select().from(s.enrollments).where(eq(s.enrollments.leadId, l!.id));
     expect(enr[0]!.state).toBe("stopped");
@@ -220,10 +220,10 @@ describe("WhatsApp capture → lead with owner (Phase 1 done-criterion)", () => 
   it("STOP withdraws consent immediately and confirms", async () => {
     await processWhatsAppPayload(waPayload("919822222222", "wamid.C1", "need data"));
     await processWhatsAppPayload(waPayload("919822222222", "wamid.C2", "STOP"));
-    const [c] = await q<{ contact_id: string }>(sql`select contact_id from channel_identities where value_normalised = '919822222222'`);
+    const [c] = await q<{ contact_id: string }>(sql`select contact_id from los_channel_identities where value_normalised = '919822222222'`);
     const st = await consentStatus(db, c!.contact_id);
     expect(st.whatsapp.optedOut).toBe(true);
-    const conf = await q<{ body: string }>(sql`select m.body from messages m join leads l on l.id = m.lead_id where l.contact_id = ${c!.contact_id} and m.direction = 'outbound' order by m.created_at desc limit 1`);
+    const conf = await q<{ body: string }>(sql`select m.body from los_messages m join los_leads l on l.id = m.lead_id where l.contact_id = ${c!.contact_id} and m.direction = 'outbound' order by m.created_at desc limit 1`);
     expect(conf[0]!.body).toMatch(/unsubscribed/i);
   });
 
@@ -242,7 +242,7 @@ describe("WhatsApp capture → lead with owner (Phase 1 done-criterion)", () => 
         },
       ],
     });
-    const [l] = await q<{ first_response_at: string | null }>(sql`select l.first_response_at from leads l join channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919833333333'`);
+    const [l] = await q<{ first_response_at: string | null }>(sql`select l.first_response_at from los_leads l join los_channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919833333333'`);
     expect(l!.first_response_at).not.toBeNull();
     const [m] = await db.select().from(s.messages).where(eq(s.messages.providerMessageId, "wamid.D2"));
     expect(m!.authorType).toBe("phone_app");
@@ -254,7 +254,7 @@ describe("email capture and threading (§6)", () => {
     const mid = "<first-1@acme.co.in>";
     await processEmail(fromPostmark(postmark({ headers: { "Message-ID": mid } })));
     const [lead] = await q<{ id: string; source: string; company: string; owner_id: string }>(sql`
-      select l.id, l.source, co.name as company, l.owner_id from leads l join companies co on co.id = l.company_id where co.domain = 'acme.co.in'`);
+      select l.id, l.source, co.name as company, l.owner_id from los_leads l join los_companies co on co.id = l.company_id where co.domain = 'acme.co.in'`);
     expect(lead!.source).toBe("email_shared");
     expect(lead!.company).toBe("Acme");
     expect(lead!.owner_id).toBeTruthy();
@@ -262,27 +262,27 @@ describe("email capture and threading (§6)", () => {
 
   it("replies thread by In-Reply-To onto the same lead", async () => {
     const [ack] = await q<{ email_message_id: string; lead_id: string }>(sql`
-      select m.email_message_id, m.lead_id from messages m join leads l on l.id = m.lead_id join companies co on co.id = l.company_id
+      select m.email_message_id, m.lead_id from los_messages m join los_leads l on l.id = m.lead_id join los_companies co on co.id = l.company_id
       where co.domain = 'acme.co.in' and m.direction = 'outbound' and m.email_message_id is not null limit 1`);
     expect(ack).toBeDefined();
     await processEmail(fromPostmark(postmark({ Subject: "Re: Need HR contacts in Pune", TextBody: "Thanks!\n\nOn Tue, Priya wrote:\n> hi", headers: { "In-Reply-To": ack!.email_message_id } })));
-    const n = await q<{ n: number }>(sql`select count(*)::int as n from leads l join companies co on co.id = l.company_id where co.domain = 'acme.co.in'`);
+    const n = await q<{ n: number }>(sql`select count(*)::int as n from los_leads l join los_companies co on co.id = l.company_id where co.domain = 'acme.co.in'`);
     expect(n[0]!.n).toBe(1);
-    const [last] = await q<{ body: string }>(sql`select body from messages where lead_id = ${ack!.lead_id} and direction = 'inbound' order by created_at desc limit 1`);
+    const [last] = await q<{ body: string }>(sql`select body from los_messages where lead_id = ${ack!.lead_id} and direction = 'inbound' order by created_at desc limit 1`);
     expect(last!.body).toBe("Thanks!");
   });
 
   it("reply-address tag threads even when headers are mangled", async () => {
-    const [l] = await q<{ id: string }>(sql`select l.id from leads l join companies co on co.id = l.company_id where co.domain = 'acme.co.in'`);
+    const [l] = await q<{ id: string }>(sql`select l.id from los_leads l join los_companies co on co.id = l.company_id where co.domain = 'acme.co.in'`);
     const addr = makeReplyAddress(l!.id, env.APP_SECRET, env.INBOUND_DOMAIN);
     await processEmail(fromPostmark(postmark({ From: "colleague@acme.co.in", To: addr, Subject: "something else", TextBody: "Looping in my colleague" })));
-    const [m] = await q<{ lead_id: string }>(sql`select lead_id from messages where body = 'Looping in my colleague'`);
+    const [m] = await q<{ lead_id: string }>(sql`select lead_id from los_messages where body = 'Looping in my colleague'`);
     expect(m!.lead_id).toBe(l!.id);
   });
 
   it("out-of-office never creates a lead and never counts as a reply", async () => {
     await processEmail(fromPostmark(postmark({ From: "ooo@newco.com", Subject: "Automatic reply: hello", headers: { "Auto-Submitted": "auto-replied" } })));
-    const n = await q<{ n: number }>(sql`select count(*)::int as n from channel_identities where value_normalised = 'ooo@newco.com'`);
+    const n = await q<{ n: number }>(sql`select count(*)::int as n from los_channel_identities where value_normalised = 'ooo@newco.com'`);
     expect(n[0]!.n).toBe(0);
   });
 
@@ -292,20 +292,20 @@ describe("email capture and threading (§6)", () => {
     await processEmail(fromPostmark(postmark(mail)));
     await processEmail(fromPostmark(postmark(mail))); // duplicate notification, different Message-ID
     const leads = await q<{ id: string; source: string; portal_lead_id: string; name: string; owner_id: string }>(sql`
-      select l.id, l.source, l.portal_lead_id, c.display_name as name, l.owner_id from leads l join contacts c on c.id = l.contact_id where l.source = 'indiamart'`);
+      select l.id, l.source, l.portal_lead_id, c.display_name as name, l.owner_id from los_leads l join los_contacts c on c.id = l.contact_id where l.source = 'indiamart'`);
     expect(leads.length).toBe(1);
     expect(leads[0]!.portal_lead_id).toBe("IM-778899");
     expect(leads[0]!.name).toBe("Suresh Mehta");
-    const ids = await q<{ value_normalised: string }>(sql`select ci.value_normalised from channel_identities ci join leads l on l.contact_id = ci.contact_id where l.id = ${leads[0]!.id} order by 1`);
+    const ids = await q<{ value_normalised: string }>(sql`select ci.value_normalised from los_channel_identities ci join los_leads l on l.contact_id = ci.contact_id where l.id = ${leads[0]!.id} order by 1`);
     expect(ids.map((i) => i.value_normalised)).toEqual(["+919820012345", "suresh@mehtatraders.in"]);
     // §9.2: portal lead → WhatsApp utility template AND email, both automatic.
-    const acks = await q<{ channel: string; kind: string }>(sql`select channel, kind from messages where lead_id = ${leads[0]!.id} and direction = 'outbound' and is_auto order by channel`);
+    const acks = await q<{ channel: string; kind: string }>(sql`select channel, kind from los_messages where lead_id = ${leads[0]!.id} and direction = 'outbound' and is_auto order by channel`);
     expect(acks).toEqual([{ channel: "email", kind: "email" }, { channel: "whatsapp", kind: "template" }]);
   });
 
   it("portal parse failure still creates a lead, flagged for the admin queue", async () => {
     await processEmail(fromPostmark(postmark({ From: "alerts@tradeindia.com", Subject: "New TradeIndia inquiry", TextBody: "A buyer is interested. Log in to view." })));
-    const [pf] = await q<{ parser: string; lead_id: string }>(sql`select parser, lead_id from parse_failures`);
+    const [pf] = await q<{ parser: string; lead_id: string }>(sql`select parser, lead_id from los_parse_failures`);
     expect(pf!.parser).toBe("tradeindia");
     const [l] = await db.select().from(s.leads).where(eq(s.leads.id, pf!.lead_id));
     expect(l!.parseFailed).toBe(true);
@@ -313,7 +313,7 @@ describe("email capture and threading (§6)", () => {
 
   it("vendor spam goes to junk, not the pipeline", async () => {
     await processEmail(fromPostmark(postmark({ From: "sales@seo-guru.biz", Subject: "SEO services to rank your website #1", TextBody: "We offer link building." })));
-    const [l] = await q<{ is_junk: boolean; owner_id: string | null }>(sql`select l.is_junk, l.owner_id from leads l join channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = 'sales@seo-guru.biz'`);
+    const [l] = await q<{ is_junk: boolean; owner_id: string | null }>(sql`select l.is_junk, l.owner_id from los_leads l join los_channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = 'sales@seo-guru.biz'`);
     expect(l!.is_junk).toBe(true);
     expect(l!.owner_id).toBeNull();
   });
@@ -325,7 +325,7 @@ describe("website form, consent ledger", () => {
       { name: "Anita Rao", email: "anita@bigco.com", phone: "9876500000", message: "Demo please", consent_marketing: true, notice_version: "2026-11-v1" },
       { eventId: "form-1", ip: "1.2.3.4", receivedAt: new Date() },
     );
-    const [c] = await q<{ contact_id: string }>(sql`select contact_id from channel_identities where value_normalised = 'anita@bigco.com'`);
+    const [c] = await q<{ contact_id: string }>(sql`select contact_id from los_channel_identities where value_normalised = 'anita@bigco.com'`);
     const st = await consentStatus(db, c!.contact_id);
     expect(st.whatsapp.marketing).toBe(true);
     expect(st.records.find((r) => r.purpose === "marketing")!.noticeVersion).toBe("2026-11-v1");
@@ -346,7 +346,7 @@ describe("website form, consent ledger", () => {
 
 describe("pipeline discipline (§8.4)", () => {
   it("blocks advancing past Engaged without qualification, then allows it", async () => {
-    const [l] = await q<{ id: string }>(sql`select l.id from leads l join channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919876543210'`);
+    const [l] = await q<{ id: string }>(sql`select l.id from los_leads l join los_channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919876543210'`);
     const actor = { type: "user" as const, id: repA };
     await expect(withTx((tx, fx) => changeStage(tx, fx, l!.id, "qualified", actor))).rejects.toMatchObject({ code: "qualification_incomplete" });
     await withTx((tx, fx) =>
@@ -377,7 +377,7 @@ describe("pipeline discipline (§8.4)", () => {
 describe("SLA and cadence engines", () => {
   it("records warning, breach and hard breach; hard breach reassigns", async () => {
     await processWhatsAppPayload(waPayload("919844444444", "wamid.E1", "need data asap"));
-    const [l] = await q<{ id: string; owner_id: string }>(sql`select l.id, l.owner_id from leads l join channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919844444444'`);
+    const [l] = await q<{ id: string; owner_id: string }>(sql`select l.id, l.owner_id from los_leads l join los_channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919844444444'`);
     const [t] = await db.select().from(s.slaTimers).where(and(eq(s.slaTimers.leadId, l!.id), eq(s.slaTimers.kind, "first_response")));
     const levels = await processTimer(t!.id, new Date(Date.now() + 60 * 60_000));
     expect(levels).toEqual(["warning", "breach", "hard_breach"]);
@@ -391,7 +391,7 @@ describe("SLA and cadence engines", () => {
 
   it("runs cadence steps: personal-touch task, then template, and logs every outcome", async () => {
     await processWhatsAppPayload(waPayload("919855555555", "wamid.F1", "hello"));
-    const [l] = await q<{ id: string }>(sql`select l.id from leads l join channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919855555555'`);
+    const [l] = await q<{ id: string }>(sql`select l.id from los_leads l join los_channel_identities ci on ci.contact_id = l.contact_id where ci.value_normalised = '919855555555'`);
     const [enr] = await db.select().from(s.enrollments).where(eq(s.enrollments.leadId, l!.id));
     const far = new Date(Date.now() + 2 * 86_400_000);
     const istHour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", hourCycle: "h23" }).format(far));
@@ -442,7 +442,7 @@ describe("reports, search, admin", () => {
     expect(dry).toMatchObject({ total: 2, valid: 1 });
     const real = await importLeads(db, rows, { type: "user", id: manager }, false);
     expect(real.created).toBe(1);
-    const [k] = await q<{ contact_id: string }>(sql`select contact_id from channel_identities where value_normalised = 'kiran@rao.in'`);
+    const [k] = await q<{ contact_id: string }>(sql`select contact_id from los_channel_identities where value_normalised = 'kiran@rao.in'`);
     const [other] = await db.insert(s.contacts).values({ orgId: env.DEFAULT_ORG_ID, displayName: "Kiran Rao" }).returning();
     await withTx((tx) => mergeContacts(tx, k!.contact_id, other!.id, { type: "user", id: manager }));
     const [merged] = await db.select().from(s.contacts).where(eq(s.contacts.id, other!.id));
@@ -450,10 +450,10 @@ describe("reports, search, admin", () => {
   });
 
   it("erasure anonymises in place and keeps counts", async () => {
-    const [c] = await q<{ contact_id: string }>(sql`select contact_id from channel_identities where value_normalised = '919822222222'`);
-    const before = await q<{ n: number }>(sql`select count(*)::int as n from messages m join leads l on l.id = m.lead_id where l.contact_id = ${c!.contact_id}`);
+    const [c] = await q<{ contact_id: string }>(sql`select contact_id from los_channel_identities where value_normalised = '919822222222'`);
+    const before = await q<{ n: number }>(sql`select count(*)::int as n from los_messages m join los_leads l on l.id = m.lead_id where l.contact_id = ${c!.contact_id}`);
     await anonymiseContact(db, c!.contact_id, { type: "user", id: manager });
-    const after = await q<{ n: number; bodies: number }>(sql`select count(*)::int as n, count(body)::int as bodies from messages m join leads l on l.id = m.lead_id where l.contact_id = ${c!.contact_id}`);
+    const after = await q<{ n: number; bodies: number }>(sql`select count(*)::int as n, count(body)::int as bodies from los_messages m join los_leads l on l.id = m.lead_id where l.contact_id = ${c!.contact_id}`);
     expect(after[0]!.n).toBe(before[0]!.n);
     expect(after[0]!.bodies).toBe(0);
   });
@@ -461,7 +461,7 @@ describe("reports, search, admin", () => {
 
 describe("reconciliation harness (Phase 1 done-criterion: 50 enquiries, zero loss)", () => {
   it("50 mixed enquiries → 50 leads, all with a named owner", async () => {
-    const before = await q<{ n: number }>(sql`select count(*)::int as n from leads`);
+    const before = await q<{ n: number }>(sql`select count(*)::int as n from los_leads`);
     const started = new Date().toISOString();
     for (let i = 0; i < 50; i++) {
       const n = String(9700000000 + i);
@@ -469,9 +469,9 @@ describe("reconciliation harness (Phase 1 done-criterion: 50 enquiries, zero los
       else if (i % 3 === 1) await processEmail(fromPostmark(postmark({ From: `buyer${i}@company${i}.com`, Subject: `Enquiry ${i}`, TextBody: `Need data ${i}` })));
       else await processForm({ name: `Form ${i}`, email: `form${i}@corp${i}.in`, message: `form ${i}` }, { eventId: `rec-${i}`, receivedAt: new Date() });
     }
-    const after = await q<{ n: number }>(sql`select count(*)::int as n from leads`);
+    const after = await q<{ n: number }>(sql`select count(*)::int as n from los_leads`);
     expect(after[0]!.n - before[0]!.n).toBe(50);
-    const unowned = await q<{ n: number }>(sql`select count(*)::int as n from leads where created_at >= ${started}::timestamptz and owner_id is null and not is_junk`);
+    const unowned = await q<{ n: number }>(sql`select count(*)::int as n from los_leads where created_at >= ${started}::timestamptz and owner_id is null and not is_junk`);
     expect(unowned[0]!.n).toBe(0);
     expect(sink.failures).toEqual([]);
   });

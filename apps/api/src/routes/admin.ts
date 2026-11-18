@@ -73,7 +73,7 @@ export async function adminRoutes(app: FastifyInstance) {
       .select({ id: users.id, name: users.name, email: users.email, role: users.role, teamId: users.teamId, isAvailable: users.isAvailable, capacity: users.capacity, active: users.active, totpEnabled: users.totpEnabled, languages: users.languages, territories: users.territories, workingHoursId: users.workingHoursId, lastSeenAt: users.lastSeenAt })
       .from(users)
       .orderBy(asc(users.name));
-    const open = await db.execute(sql`select owner_id, count(*)::int as n from leads where closed_at is null group by owner_id`);
+    const open = await db.execute(sql`select owner_id, count(*)::int as n from los_leads where closed_at is null group by owner_id`);
     const counts = new Map((open.rows as { owner_id: string; n: number }[]).map((r) => [r.owner_id, r.n]));
     return { items: rows.map((r) => ({ ...r, openLeads: counts.get(r.id) ?? 0 })), teams: await db.select().from(teams) };
   });
@@ -127,7 +127,7 @@ export async function adminRoutes(app: FastifyInstance) {
         .update(users)
         .set({ ...rest, ...(rest.email ? { email: rest.email.toLowerCase() } : {}), ...(password ? { passwordHash: await hashPassword(password) } : {}) })
         .where(eq(users.id, id));
-      if (b.active === false) await tx.execute(sql`delete from sessions where user_id = ${id}::uuid`);
+      if (b.active === false) await tx.execute(sql`delete from los_sessions where user_id = ${id}::uuid`);
       await audit(tx, actorOf(req), "user.update", "user", id, { role: before.role, active: before.active }, { ...rest });
     });
     return { ok: true };
@@ -411,9 +411,9 @@ export async function adminRoutes(app: FastifyInstance) {
     mgr(req);
     const r = await db.execute(sql`
       select d.*, row_to_json(a) as a, row_to_json(b) as b,
-        (select json_agg(json_build_object('kind', kind, 'value', value_normalised)) from channel_identities where contact_id = d.contact_a) as a_identities,
-        (select json_agg(json_build_object('kind', kind, 'value', value_normalised)) from channel_identities where contact_id = d.contact_b) as b_identities
-      from duplicate_suggestions d join contacts a on a.id = d.contact_a join contacts b on b.id = d.contact_b
+        (select json_agg(json_build_object('kind', kind, 'value', value_normalised)) from los_channel_identities where contact_id = d.contact_a) as a_identities,
+        (select json_agg(json_build_object('kind', kind, 'value', value_normalised)) from los_channel_identities where contact_id = d.contact_b) as b_identities
+      from los_duplicate_suggestions d join los_contacts a on a.id = d.contact_a join los_contacts b on b.id = d.contact_b
       where d.status = 'open' order by d.created_at desc limit 100`);
     return { items: r.rows };
   });
@@ -443,7 +443,7 @@ export async function adminRoutes(app: FastifyInstance) {
         count(*) filter (where processed_at is null and error is not null)::int as failing,
         count(*) filter (where received_at > now() - interval '1 hour')::int as last_hour,
         min(received_at) filter (where processed_at is null) as oldest_unprocessed
-      from webhook_events`)).rows;
+      from los_webhook_events`)).rows;
     const failed = await db
       .select({ id: webhookEvents.id, provider: webhookEvents.provider, externalId: webhookEvents.externalId, receivedAt: webhookEvents.receivedAt, attempts: webhookEvents.attempts, error: webhookEvents.error })
       .from(webhookEvents)
@@ -453,7 +453,7 @@ export async function adminRoutes(app: FastifyInstance) {
     const [msgs] = (await db.execute(sql`
       select count(*) filter (where status in ('queued','sending') and (send_at is null or send_at <= now()))::int as outbound_queue,
              count(*) filter (where status = 'failed' and created_at > now() - interval '24 hours')::int as failed_24h
-      from messages`)).rows;
+      from los_messages`)).rows;
     const mailboxes = await db.select({ email: mailboxConnections.email, status: mailboxConnections.status, watchExpiresAt: mailboxConnections.watchExpiresAt, lastError: mailboxConnections.lastError }).from(mailboxConnections);
     const numbers = await db.select().from(waNumbers);
     return { webhooks: stats, failedEvents: failed, messages: msgs, mailboxes, numbers };
@@ -566,8 +566,8 @@ export async function adminRoutes(app: FastifyInstance) {
       const r = await db.execute(sql`
         select 'L-' || l.number as lead, l.stage, l.source, l.created_at, l.closed_at, l.value_estimate, l.score,
                ct.display_name as contact, co.name as company, u.name as owner,
-               (select string_agg(value_normalised, ' ') from channel_identities where contact_id = ct.id and kind <> 'wa_id') as routes
-        from leads l join contacts ct on ct.id = l.contact_id left join companies co on co.id = l.company_id left join users u on u.id = l.owner_id
+               (select string_agg(value_normalised, ' ') from los_channel_identities where contact_id = ct.id and kind <> 'wa_id') as routes
+        from los_leads l join los_contacts ct on ct.id = l.contact_id left join los_companies co on co.id = l.company_id left join los_users u on u.id = l.owner_id
         where ct.anonymised_at is null order by l.created_at desc`);
       await withTx((tx) => audit(tx, actorOf(req), "leads.export", "lead", null, null, { rows: r.rows.length }));
       const cols = ["lead", "stage", "source", "created_at", "closed_at", "value_estimate", "score", "contact", "company", "owner", "routes"];

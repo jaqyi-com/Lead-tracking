@@ -138,7 +138,7 @@ export async function miscRoutes(app: FastifyInstance) {
   app.get("/api/notifications", async (req) => {
     const u = requireUser(req);
     const items = await db.select().from(notifications).where(eq(notifications.userId, u.id)).orderBy(desc(notifications.createdAt)).limit(50);
-    const [{ unread }] = (await db.execute(sql`select count(*)::int as unread from notifications where user_id = ${u.id}::uuid and read_at is null`)).rows as { unread: number }[];
+    const [{ unread }] = (await db.execute(sql`select count(*)::int as unread from los_notifications where user_id = ${u.id}::uuid and read_at is null`)).rows as { unread: number }[];
     return { items, unread };
   });
 

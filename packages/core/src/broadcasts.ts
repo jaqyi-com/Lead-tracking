@@ -27,7 +27,7 @@ async function segmentContacts(db: Db, seg: Segment): Promise<{ contactId: strin
   if (seg.createdBefore) conds.push(sql`l.created_at <= ${seg.createdBefore}::timestamptz`);
   const r = await db.execute(sql`
     select distinct on (l.contact_id) l.contact_id, l.id as lead_id
-    from leads l join contacts c on c.id = l.contact_id
+    from los_leads l join los_contacts c on c.id = l.contact_id
     where ${sql.join(conds, sql` and `)} and not c.do_not_contact and c.anonymised_at is null and c.merged_into_id is null
     order by l.contact_id, l.opened_at desc`);
   return (r.rows as { contact_id: string; lead_id: string }[]).map((x) => ({ contactId: x.contact_id, leadId: x.lead_id }));
@@ -156,7 +156,7 @@ export async function fanoutBroadcast(db: Db, broadcastId: string): Promise<void
 export async function broadcastResults(db: Db, broadcastId: string) {
   const r = await db.execute(sql`
     select br.status as recipient_status, m.status as message_status, count(*)::int as n
-    from broadcast_recipients br left join messages m on m.id = br.message_id
+    from los_broadcast_recipients br left join los_messages m on m.id = br.message_id
     where br.broadcast_id = ${broadcastId} group by 1, 2`);
   return r.rows;
 }

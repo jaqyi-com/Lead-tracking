@@ -95,7 +95,7 @@ export async function stopEnrollments(tx: Db, leadId: string, reason: string): P
 /** Execute the due step of an enrollment. Safe to call repeatedly (checks next_run_at and state). */
 export async function runEnrollment(enrollmentId: string, now: Date = new Date()): Promise<string> {
   return withTx(async (tx, fx) => {
-    await tx.execute(sql`select id from enrollments where id = ${enrollmentId} for update`);
+    await tx.execute(sql`select id from los_enrollments where id = ${enrollmentId} for update`);
     const [enr] = await tx.select().from(enrollments).where(eq(enrollments.id, enrollmentId));
     if (!enr || enr.state !== "active") return "inactive";
     if (enr.nextRunAt && enr.nextRunAt.getTime() > now.getTime() + 1000) return "not_due";

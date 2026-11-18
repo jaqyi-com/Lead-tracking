@@ -71,14 +71,14 @@ export type TemplateVariable = { key: string; example?: string; source?: string 
 // Organisation, people, calendars
 // ---------------------------------------------------------------------------
 
-export const orgs = pgTable("orgs", {
+export const orgs = pgTable("los_orgs", {
   id: id(),
   name: text("name").notNull(),
   settings: jsonb("settings").$type<Record<string, unknown>>().notNull().default({}),
   createdAt: createdAt(),
 });
 
-export const businessHours = pgTable("business_hours", {
+export const businessHours = pgTable("los_business_hours", {
   id: id(),
   orgId: orgId(),
   name: text("name").notNull(),
@@ -88,7 +88,7 @@ export const businessHours = pgTable("business_hours", {
 });
 
 export const holidays = pgTable(
-  "holidays",
+  "los_holidays",
   {
     id: id(),
     orgId: orgId(),
@@ -96,10 +96,10 @@ export const holidays = pgTable(
     day: date("day").notNull(),
     name: text("name").notNull(),
   },
-  (t) => [index("holidays_org_day_idx").on(t.orgId, t.day)],
+  (t) => [index("los_holidays_org_day_idx").on(t.orgId, t.day)],
 );
 
-export const teams = pgTable("teams", {
+export const teams = pgTable("los_teams", {
   id: id(),
   orgId: orgId(),
   name: text("name").notNull(),
@@ -108,7 +108,7 @@ export const teams = pgTable("teams", {
 });
 
 export const users = pgTable(
-  "users",
+  "los_users",
   {
     id: id(),
     orgId: orgId(),
@@ -131,11 +131,11 @@ export const users = pgTable(
     lastSeenAt: ts("last_seen_at"),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex("users_email_uq").on(t.email)],
+  (t) => [uniqueIndex("los_users_email_uq").on(t.email)],
 );
 
 export const sessions = pgTable(
-  "sessions",
+  "los_sessions",
   {
     id: text("id").primaryKey(), // sha256 of the session token
     userId: uuid("user_id").notNull(),
@@ -145,10 +145,10 @@ export const sessions = pgTable(
     userAgent: text("user_agent"),
     createdAt: createdAt(),
   },
-  (t) => [index("sessions_user_idx").on(t.userId)],
+  (t) => [index("los_sessions_user_idx").on(t.userId)],
 );
 
-export const apiTokens = pgTable("api_tokens", {
+export const apiTokens = pgTable("los_api_tokens", {
   id: id(),
   orgId: orgId(),
   userId: uuid("user_id").notNull(),
@@ -161,7 +161,7 @@ export const apiTokens = pgTable("api_tokens", {
 });
 
 export const notifications = pgTable(
-  "notifications",
+  "los_notifications",
   {
     id: id(),
     orgId: orgId(),
@@ -174,7 +174,7 @@ export const notifications = pgTable(
     readAt: ts("read_at"),
     createdAt: createdAt(),
   },
-  (t) => [index("notifications_user_idx").on(t.userId, t.createdAt)],
+  (t) => [index("los_notifications_user_idx").on(t.userId, t.createdAt)],
 );
 
 // ---------------------------------------------------------------------------
@@ -182,7 +182,7 @@ export const notifications = pgTable(
 // ---------------------------------------------------------------------------
 
 export const companies = pgTable(
-  "companies",
+  "los_companies",
   {
     id: id(),
     orgId: orgId(),
@@ -201,13 +201,13 @@ export const companies = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    uniqueIndex("companies_org_domain_uq").on(t.orgId, t.domain).where(sql`${t.domain} is not null`),
-    index("companies_name_trgm").using("gin", sql`${t.name} gin_trgm_ops`),
+    uniqueIndex("los_companies_org_domain_uq").on(t.orgId, t.domain).where(sql`${t.domain} is not null`),
+    index("los_companies_name_trgm").using("gin", sql`${t.name} gin_trgm_ops`),
   ],
 );
 
 export const contacts = pgTable(
-  "contacts",
+  "los_contacts",
   {
     id: id(),
     orgId: orgId(),
@@ -229,8 +229,8 @@ export const contacts = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("contacts_company_idx").on(t.companyId),
-    index("contacts_name_trgm").using(
+    index("los_contacts_company_idx").on(t.companyId),
+    index("los_contacts_name_trgm").using(
       "gin",
       sql`(coalesce(${t.displayName}, '') || ' ' || coalesce(${t.firstName}, '') || ' ' || coalesce(${t.lastName}, '')) gin_trgm_ops`,
     ),
@@ -238,7 +238,7 @@ export const contacts = pgTable(
 );
 
 export const channelIdentities = pgTable(
-  "channel_identities",
+  "los_channel_identities",
   {
     id: id(),
     orgId: orgId(),
@@ -251,12 +251,12 @@ export const channelIdentities = pgTable(
     createdAt: createdAt(),
   },
   (t) => [
-    uniqueIndex("channel_identities_uq").on(t.orgId, t.kind, t.valueNormalised),
-    index("channel_identities_contact_idx").on(t.contactId),
+    uniqueIndex("los_channel_identities_uq").on(t.orgId, t.kind, t.valueNormalised),
+    index("los_channel_identities_contact_idx").on(t.contactId),
   ],
 );
 
-export const freeEmailDomains = pgTable("free_email_domains", {
+export const freeEmailDomains = pgTable("los_free_email_domains", {
   domain: text("domain").primaryKey(),
 });
 
@@ -265,7 +265,7 @@ export const freeEmailDomains = pgTable("free_email_domains", {
 // ---------------------------------------------------------------------------
 
 export const leadSources = pgTable(
-  "lead_sources",
+  "los_lead_sources",
   {
     id: id(),
     orgId: orgId(),
@@ -273,11 +273,11 @@ export const leadSources = pgTable(
     label: text("label").notNull(),
     active: boolean("active").notNull().default(true),
   },
-  (t) => [uniqueIndex("lead_sources_key_uq").on(t.orgId, t.key)],
+  (t) => [uniqueIndex("los_lead_sources_key_uq").on(t.orgId, t.key)],
 );
 
 export const lostReasons = pgTable(
-  "lost_reasons",
+  "los_lost_reasons",
   {
     id: id(),
     orgId: orgId(),
@@ -285,11 +285,11 @@ export const lostReasons = pgTable(
     label: text("label").notNull(),
     active: boolean("active").notNull().default(true),
   },
-  (t) => [uniqueIndex("lost_reasons_key_uq").on(t.orgId, t.key)],
+  (t) => [uniqueIndex("los_lost_reasons_key_uq").on(t.orgId, t.key)],
 );
 
 export const leads = pgTable(
-  "leads",
+  "los_leads",
   {
     id: id(),
     orgId: orgId(),
@@ -333,18 +333,18 @@ export const leads = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("leads_open_contact_idx").on(t.contactId).where(sql`${t.closedAt} is null`),
-    index("leads_owner_stage_idx").on(t.ownerId, t.stage),
-    index("leads_stage_idx").on(t.orgId, t.stage),
-    index("leads_created_idx").on(t.orgId, t.createdAt),
-    uniqueIndex("leads_portal_uq")
+    index("los_leads_open_contact_idx").on(t.contactId).where(sql`${t.closedAt} is null`),
+    index("los_leads_owner_stage_idx").on(t.ownerId, t.stage),
+    index("los_leads_stage_idx").on(t.orgId, t.stage),
+    index("los_leads_created_idx").on(t.orgId, t.createdAt),
+    uniqueIndex("los_leads_portal_uq")
       .on(t.orgId, t.source, t.portalLeadId)
       .where(sql`${t.portalLeadId} is not null`),
   ],
 );
 
 export const activities = pgTable(
-  "activities",
+  "los_activities",
   {
     id: id(),
     orgId: orgId(),
@@ -356,13 +356,13 @@ export const activities = pgTable(
     occurredAt: ts("occurred_at").notNull().defaultNow(),
   },
   (t) => [
-    index("activities_lead_idx").on(t.leadId, t.occurredAt),
-    index("activities_type_idx").on(t.orgId, t.type, t.occurredAt),
+    index("los_activities_lead_idx").on(t.leadId, t.occurredAt),
+    index("los_activities_type_idx").on(t.orgId, t.type, t.occurredAt),
   ],
 );
 
 export const notes = pgTable(
-  "notes",
+  "los_notes",
   {
     id: id(),
     orgId: orgId(),
@@ -374,11 +374,11 @@ export const notes = pgTable(
     search: tsvector("search").generatedAlwaysAs(sql`to_tsvector('simple', coalesce(body, ''))`),
     createdAt: createdAt(),
   },
-  (t) => [index("notes_lead_idx").on(t.leadId), index("notes_search_idx").using("gin", t.search)],
+  (t) => [index("los_notes_lead_idx").on(t.leadId), index("los_notes_search_idx").using("gin", t.search)],
 );
 
 export const tasks = pgTable(
-  "tasks",
+  "los_tasks",
   {
     id: id(),
     orgId: orgId(),
@@ -392,8 +392,8 @@ export const tasks = pgTable(
     createdAt: createdAt(),
   },
   (t) => [
-    index("tasks_assignee_open_idx").on(t.assigneeId, t.dueAt).where(sql`${t.completedAt} is null`),
-    index("tasks_lead_idx").on(t.leadId),
+    index("los_tasks_assignee_open_idx").on(t.assigneeId, t.dueAt).where(sql`${t.completedAt} is null`),
+    index("los_tasks_lead_idx").on(t.leadId),
   ],
 );
 
@@ -402,7 +402,7 @@ export const tasks = pgTable(
 // ---------------------------------------------------------------------------
 
 export const waNumbers = pgTable(
-  "wa_numbers",
+  "los_wa_numbers",
   {
     id: id(),
     orgId: orgId(),
@@ -414,11 +414,11 @@ export const waNumbers = pgTable(
     isTest: boolean("is_test").notNull().default(false),
     lastSyncedAt: ts("last_synced_at"),
   },
-  (t) => [uniqueIndex("wa_numbers_pnid_uq").on(t.phoneNumberId)],
+  (t) => [uniqueIndex("los_wa_numbers_pnid_uq").on(t.phoneNumberId)],
 );
 
 export const mailboxConnections = pgTable(
-  "mailbox_connections",
+  "los_mailbox_connections",
   {
     id: id(),
     orgId: orgId(),
@@ -434,11 +434,11 @@ export const mailboxConnections = pgTable(
     lastError: text("last_error"),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex("mailbox_connections_email_uq").on(t.email)],
+  (t) => [uniqueIndex("los_mailbox_connections_email_uq").on(t.email)],
 );
 
 export const conversations = pgTable(
-  "conversations",
+  "los_conversations",
   {
     id: id(),
     orgId: orgId(),
@@ -466,15 +466,15 @@ export const conversations = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [
-    index("conversations_lead_idx").on(t.leadId),
-    index("conversations_inbox_idx").on(t.orgId, t.state, t.lastMessageAt),
-    index("conversations_assigned_idx").on(t.assignedTo, t.lastMessageAt),
-    index("conversations_window_idx").on(t.windowExpiresAt).where(sql`${t.windowExpiresAt} is not null`),
+    index("los_conversations_lead_idx").on(t.leadId),
+    index("los_conversations_inbox_idx").on(t.orgId, t.state, t.lastMessageAt),
+    index("los_conversations_assigned_idx").on(t.assignedTo, t.lastMessageAt),
+    index("los_conversations_window_idx").on(t.windowExpiresAt).where(sql`${t.windowExpiresAt} is not null`),
   ],
 );
 
 export const messages = pgTable(
-  "messages",
+  "los_messages",
   {
     id: id(),
     orgId: orgId(),
@@ -524,19 +524,19 @@ export const messages = pgTable(
     createdAt: createdAt(),
   },
   (t) => [
-    uniqueIndex("messages_provider_uq")
+    uniqueIndex("los_messages_provider_uq")
       .on(t.channel, t.providerMessageId)
       .where(sql`${t.providerMessageId} is not null`),
-    uniqueIndex("messages_idem_uq").on(t.idempotencyKey).where(sql`${t.idempotencyKey} is not null`),
-    index("messages_conversation_idx").on(t.conversationId, t.createdAt),
-    index("messages_email_mid_idx").on(t.emailMessageId).where(sql`${t.emailMessageId} is not null`),
-    index("messages_search_idx").using("gin", t.search),
-    index("messages_status_idx").on(t.status).where(sql`${t.status} in ('queued','sending')`),
+    uniqueIndex("los_messages_idem_uq").on(t.idempotencyKey).where(sql`${t.idempotencyKey} is not null`),
+    index("los_messages_conversation_idx").on(t.conversationId, t.createdAt),
+    index("los_messages_email_mid_idx").on(t.emailMessageId).where(sql`${t.emailMessageId} is not null`),
+    index("los_messages_search_idx").using("gin", t.search),
+    index("los_messages_status_idx").on(t.status).where(sql`${t.status} in ('queued','sending')`),
   ],
 );
 
 export const attachments = pgTable(
-  "attachments",
+  "los_attachments",
   {
     id: id(),
     orgId: orgId(),
@@ -552,7 +552,7 @@ export const attachments = pgTable(
     scannedAt: ts("scanned_at"),
     createdAt: createdAt(),
   },
-  (t) => [index("attachments_owner_idx").on(t.ownerType, t.ownerId)],
+  (t) => [index("los_attachments_owner_idx").on(t.ownerType, t.ownerId)],
 );
 
 // ---------------------------------------------------------------------------
@@ -560,7 +560,7 @@ export const attachments = pgTable(
 // ---------------------------------------------------------------------------
 
 export const templates = pgTable(
-  "templates",
+  "los_templates",
   {
     id: id(),
     orgId: orgId(),
@@ -583,10 +583,10 @@ export const templates = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
   },
-  (t) => [uniqueIndex("templates_provider_uq").on(t.orgId, t.channel, t.providerName, t.language)],
+  (t) => [uniqueIndex("los_templates_provider_uq").on(t.orgId, t.channel, t.providerName, t.language)],
 );
 
-export const snippets = pgTable("snippets", {
+export const snippets = pgTable("los_snippets", {
   id: id(),
   orgId: orgId(),
   folder: text("folder").notNull().default("General"),
@@ -603,7 +603,7 @@ export const snippets = pgTable("snippets", {
 // ---------------------------------------------------------------------------
 
 export const webhookEvents = pgTable(
-  "webhook_events",
+  "los_webhook_events",
   {
     id: id(),
     provider: text("provider").notNull(), // whatsapp|postmark|gmail|form|ses
@@ -617,12 +617,12 @@ export const webhookEvents = pgTable(
     error: text("error"),
   },
   (t) => [
-    uniqueIndex("webhook_events_uq").on(t.provider, t.externalId),
-    index("webhook_events_unprocessed_idx").on(t.receivedAt).where(sql`${t.processedAt} is null`),
+    uniqueIndex("los_webhook_events_uq").on(t.provider, t.externalId),
+    index("los_webhook_events_unprocessed_idx").on(t.receivedAt).where(sql`${t.processedAt} is null`),
   ],
 );
 
-export const parseFailures = pgTable("parse_failures", {
+export const parseFailures = pgTable("los_parse_failures", {
   id: id(),
   orgId: orgId(),
   leadId: uuid("lead_id"),
@@ -651,7 +651,7 @@ export type RoutingConditions = {
   minScore?: number;
 };
 
-export const routingRules = pgTable("routing_rules", {
+export const routingRules = pgTable("los_routing_rules", {
   id: id(),
   orgId: orgId(),
   name: text("name").notNull(),
@@ -665,7 +665,7 @@ export const routingRules = pgTable("routing_rules", {
   createdAt: createdAt(),
 });
 
-export const slaPolicies = pgTable("sla_policies", {
+export const slaPolicies = pgTable("los_sla_policies", {
   id: id(),
   orgId: orgId(),
   kind: text("kind").notNull(), // assignment|first_response|reply|stage_exit
@@ -675,7 +675,7 @@ export const slaPolicies = pgTable("sla_policies", {
 });
 
 export const slaTimers = pgTable(
-  "sla_timers",
+  "los_sla_timers",
   {
     id: id(),
     orgId: orgId(),
@@ -697,13 +697,13 @@ export const slaTimers = pgTable(
     stoppedAt: ts("stopped_at"),
   },
   (t) => [
-    index("sla_timers_running_idx").on(t.state, t.warnAt).where(sql`${t.state} = 'running'`),
-    index("sla_timers_lead_idx").on(t.leadId),
+    index("los_sla_timers_running_idx").on(t.state, t.warnAt).where(sql`${t.state} = 'running'`),
+    index("los_sla_timers_lead_idx").on(t.leadId),
   ],
 );
 
 export const slaBreaches = pgTable(
-  "sla_breaches",
+  "los_sla_breaches",
   {
     id: id(),
     orgId: orgId(),
@@ -714,10 +714,10 @@ export const slaBreaches = pgTable(
     ownerId: uuid("owner_id"),
     occurredAt: ts("occurred_at").notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("sla_breaches_uq").on(t.timerId, t.level)],
+  (t) => [uniqueIndex("los_sla_breaches_uq").on(t.timerId, t.level)],
 );
 
-export const sequences = pgTable("sequences", {
+export const sequences = pgTable("los_sequences", {
   id: id(),
   orgId: orgId(),
   name: text("name").notNull(),
@@ -731,7 +731,7 @@ export type StepChannel = "same_channel" | "whatsapp" | "email" | "whatsapp_or_e
 export type StepAction = "send" | "task" | "move_to_nurture";
 
 export const sequenceSteps = pgTable(
-  "sequence_steps",
+  "los_sequence_steps",
   {
     id: id(),
     sequenceId: uuid("sequence_id").notNull(),
@@ -748,11 +748,11 @@ export const sequenceSteps = pgTable(
     revisitDays: integer("revisit_days"),
     requiresHuman: boolean("requires_human").notNull().default(false), // e.g. "rep's personal first touch" → task
   },
-  (t) => [uniqueIndex("sequence_steps_pos_uq").on(t.sequenceId, t.position)],
+  (t) => [uniqueIndex("los_sequence_steps_pos_uq").on(t.sequenceId, t.position)],
 );
 
 export const enrollments = pgTable(
-  "enrollments",
+  "los_enrollments",
   {
     id: id(),
     orgId: orgId(),
@@ -767,13 +767,13 @@ export const enrollments = pgTable(
     endedAt: ts("ended_at"),
   },
   (t) => [
-    index("enrollments_due_idx").on(t.nextRunAt).where(sql`${t.state} = 'active'`),
-    uniqueIndex("enrollments_active_uq").on(t.leadId, t.sequenceId).where(sql`${t.state} = 'active'`),
+    index("los_enrollments_due_idx").on(t.nextRunAt).where(sql`${t.state} = 'active'`),
+    uniqueIndex("los_enrollments_active_uq").on(t.leadId, t.sequenceId).where(sql`${t.state} = 'active'`),
   ],
 );
 
 export const enrollmentEvents = pgTable(
-  "enrollment_events",
+  "los_enrollment_events",
   {
     id: id(),
     enrollmentId: uuid("enrollment_id").notNull(),
@@ -784,7 +784,7 @@ export const enrollmentEvents = pgTable(
     messageId: uuid("message_id"),
     occurredAt: ts("occurred_at").notNull().defaultNow(),
   },
-  (t) => [index("enrollment_events_enr_idx").on(t.enrollmentId)],
+  (t) => [index("los_enrollment_events_enr_idx").on(t.enrollmentId)],
 );
 
 // ---------------------------------------------------------------------------
@@ -792,7 +792,7 @@ export const enrollmentEvents = pgTable(
 // ---------------------------------------------------------------------------
 
 export const noticeVersions = pgTable(
-  "notice_versions",
+  "los_notice_versions",
   {
     id: id(),
     orgId: orgId(),
@@ -800,12 +800,12 @@ export const noticeVersions = pgTable(
     body: text("body").notNull(),
     publishedAt: ts("published_at").notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("notice_versions_uq").on(t.orgId, t.version)],
+  (t) => [uniqueIndex("los_notice_versions_uq").on(t.orgId, t.version)],
 );
 
 /** Append-only. The current state for (contact, channel, purpose) is the latest row. */
 export const consentRecords = pgTable(
-  "consent_records",
+  "los_consent_records",
   {
     id: id(),
     orgId: orgId(),
@@ -820,11 +820,11 @@ export const consentRecords = pgTable(
     capturedBy: uuid("captured_by"),
     capturedAt: ts("captured_at").notNull().defaultNow(),
   },
-  (t) => [index("consent_contact_idx").on(t.contactId, t.channel, t.capturedAt)],
+  (t) => [index("los_consent_contact_idx").on(t.contactId, t.channel, t.capturedAt)],
 );
 
 export const auditLog = pgTable(
-  "audit_log",
+  "los_audit_log",
   {
     id: id(),
     orgId: orgId(),
@@ -838,10 +838,10 @@ export const auditLog = pgTable(
     ip: text("ip"),
     at: ts("at").notNull().defaultNow(),
   },
-  (t) => [index("audit_entity_idx").on(t.entity, t.entityId), index("audit_at_idx").on(t.at)],
+  (t) => [index("los_audit_entity_idx").on(t.entity, t.entityId), index("los_audit_at_idx").on(t.at)],
 );
 
-export const dataRightsRequests = pgTable("data_rights_requests", {
+export const dataRightsRequests = pgTable("los_data_rights_requests", {
   id: id(),
   orgId: orgId(),
   contactId: uuid("contact_id"),
@@ -858,7 +858,7 @@ export const dataRightsRequests = pgTable("data_rights_requests", {
 });
 
 export const duplicateSuggestions = pgTable(
-  "duplicate_suggestions",
+  "los_duplicate_suggestions",
   {
     id: id(),
     orgId: orgId(),
@@ -870,14 +870,14 @@ export const duplicateSuggestions = pgTable(
     resolvedAt: ts("resolved_at"),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex("duplicate_pair_uq").on(t.contactA, t.contactB)],
+  (t) => [uniqueIndex("los_duplicate_pair_uq").on(t.contactA, t.contactB)],
 );
 
 // ---------------------------------------------------------------------------
 // Intelligence
 // ---------------------------------------------------------------------------
 
-export const enrichmentResults = pgTable("enrichment_results", {
+export const enrichmentResults = pgTable("los_enrichment_results", {
   id: id(),
   orgId: orgId(),
   contactId: uuid("contact_id"),
@@ -889,7 +889,7 @@ export const enrichmentResults = pgTable("enrichment_results", {
 });
 
 export const rateCard = pgTable(
-  "rate_card",
+  "los_rate_card",
   {
     id: id(),
     country: text("country").notNull(), // ISO-2, or '*' default
@@ -898,10 +898,10 @@ export const rateCard = pgTable(
     rate: numeric("rate", { precision: 10, scale: 4 }).notNull(),
     effectiveFrom: date("effective_from").notNull(),
   },
-  (t) => [uniqueIndex("rate_card_uq").on(t.country, t.category, t.effectiveFrom)],
+  (t) => [uniqueIndex("los_rate_card_uq").on(t.country, t.category, t.effectiveFrom)],
 );
 
-export const broadcasts = pgTable("broadcasts", {
+export const broadcasts = pgTable("los_broadcasts", {
   id: id(),
   orgId: orgId(),
   name: text("name").notNull(),
@@ -920,7 +920,7 @@ export const broadcasts = pgTable("broadcasts", {
 });
 
 export const broadcastRecipients = pgTable(
-  "broadcast_recipients",
+  "los_broadcast_recipients",
   {
     id: id(),
     broadcastId: uuid("broadcast_id").notNull(),
@@ -930,5 +930,5 @@ export const broadcastRecipients = pgTable(
     status: text("status").notNull().default("pending"), // pending|queued|skipped
     skipReason: text("skip_reason"),
   },
-  (t) => [uniqueIndex("broadcast_recipient_uq").on(t.broadcastId, t.contactId)],
+  (t) => [uniqueIndex("los_broadcast_recipient_uq").on(t.broadcastId, t.contactId)],
 );

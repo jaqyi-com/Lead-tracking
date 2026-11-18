@@ -33,9 +33,9 @@ export async function search(db: Db, q: string, scope: SearchScope, limit = 30):
   if (phone || email) {
     const r = await db.execute(sql`
       select c.id, coalesce(c.display_name, ci.value_raw) as title, ci.value_normalised as snippet,
-             (select l.id from leads l where l.contact_id = c.id and ${leadScope(scope)} order by l.opened_at desc limit 1) as lead_id,
+             (select l.id from los_leads l where l.contact_id = c.id and ${leadScope(scope)} order by l.opened_at desc limit 1) as lead_id,
              c.updated_at as at
-      from channel_identities ci join contacts c on c.id = ci.contact_id
+      from los_channel_identities ci join los_contacts c on c.id = ci.contact_id
       where ci.value_normalised in (${phone?.e164 ?? ""}, ${email ?? ""}, ${phone ? phone.e164.replace("+", "") : ""})
       limit 10`);
     for (const row of r.rows as Record<string, string>[]) {
@@ -47,9 +47,9 @@ export async function search(db: Db, q: string, scope: SearchScope, limit = 30):
   const contactsRes = await db.execute(sql`
     select c.id, coalesce(c.display_name, trim(coalesce(c.first_name,'') || ' ' || coalesce(c.last_name,''))) as title,
            coalesce(c.job_title, '') || case when co.name is not null then ' · ' || co.name else '' end as snippet,
-           (select l.id from leads l where l.contact_id = c.id and ${leadScope(scope)} order by l.opened_at desc limit 1) as lead_id,
+           (select l.id from los_leads l where l.contact_id = c.id and ${leadScope(scope)} order by l.opened_at desc limit 1) as lead_id,
            c.updated_at as at
-    from contacts c left join companies co on co.id = c.company_id
+    from los_contacts c left join los_companies co on co.id = c.company_id
     where c.merged_into_id is null and c.anonymised_at is null
       and (coalesce(c.display_name,'') || ' ' || coalesce(c.first_name,'') || ' ' || coalesce(c.last_name,'')) ilike ${like}
     order by c.updated_at desc limit 10`);
@@ -61,9 +61,9 @@ export async function search(db: Db, q: string, scope: SearchScope, limit = 30):
 
   const companiesRes = await db.execute(sql`
     select co.id, co.name as title, coalesce(co.domain, '') || ' ' || coalesce(co.city, '') as snippet,
-           (select l.id from leads l where l.company_id = co.id and ${leadScope(scope)} order by l.opened_at desc limit 1) as lead_id,
+           (select l.id from los_leads l where l.company_id = co.id and ${leadScope(scope)} order by l.opened_at desc limit 1) as lead_id,
            co.updated_at as at
-    from companies co where co.name ilike ${like} or co.domain ilike ${like}
+    from los_companies co where co.name ilike ${like} or co.domain ilike ${like}
     order by co.updated_at desc limit 8`);
   for (const row of companiesRes.rows as Record<string, string>[]) {
     hits.push({ type: "company", id: row.id!, leadId: row.lead_id ?? null, conversationId: null, title: row.title!, snippet: row.snippet!, at: String(row.at) });
@@ -75,7 +75,7 @@ export async function search(db: Db, q: string, scope: SearchScope, limit = 30):
              coalesce(c.display_name, 'Message') as title,
              ts_headline('simple', coalesce(m.body, ''), plainto_tsquery('simple', ${term}), 'MaxWords=18, MinWords=6') as snippet,
              m.created_at as at
-      from messages m join leads l on l.id = m.lead_id join contacts c on c.id = l.contact_id
+      from los_messages m join los_leads l on l.id = m.lead_id join los_contacts c on c.id = l.contact_id
       where m.search @@ plainto_tsquery('simple', ${term}) and ${leadScope(scope)}
       order by m.created_at desc limit ${limit}`);
     for (const row of msgRes.rows as Record<string, string>[]) {
@@ -84,7 +84,7 @@ export async function search(db: Db, q: string, scope: SearchScope, limit = 30):
     const noteRes = await db.execute(sql`
       select n.id, n.lead_id, 'Note' as title,
              ts_headline('simple', n.body, plainto_tsquery('simple', ${term}), 'MaxWords=18, MinWords=6') as snippet, n.created_at as at
-      from notes n join leads l on l.id = n.lead_id
+      from los_notes n join los_leads l on l.id = n.lead_id
       where n.search @@ plainto_tsquery('simple', ${term}) and ${leadScope(scope)}
       order by n.created_at desc limit 10`);
     for (const row of noteRes.rows as Record<string, string>[]) {

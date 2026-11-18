@@ -65,7 +65,7 @@ export async function leadRoutes(app: FastifyInstance) {
       .from(users)
       .where(eq(users.active, true))
       .orderBy(asc(users.name));
-    const sources = (await db.execute(sql`select key, label from lead_sources where active order by label`)).rows;
+    const sources = (await db.execute(sql`select key, label from los_lead_sources where active order by label`)).rows;
     return { stages: STAGES, openStages: OPEN_STAGES, lostReasons: reasons, users: people, sources, qualificationFields: QUALIFICATION_FIELDS };
   });
 
@@ -115,9 +115,9 @@ export async function leadRoutes(app: FastifyInstance) {
       select l.id, l.number, l.stage, l.source, l.source_detail, l.score, l.value_estimate, l.owner_id, l.created_at, l.last_activity_at,
              l.next_step, l.next_step_at, l.first_response_business_minutes, l.parse_failed, l.tags, l.enquiry,
              ct.display_name as contact_name, co.name as company_name, u.name as owner_name
-      from leads l join contacts ct on ct.id = l.contact_id left join companies co on co.id = l.company_id left join users u on u.id = l.owner_id
+      from los_leads l join los_contacts ct on ct.id = l.contact_id left join los_companies co on co.id = l.company_id left join los_users u on u.id = l.owner_id
       where ${where} order by ${order} limit ${q.pageSize} offset ${(q.page - 1) * q.pageSize}`);
-    const [{ total }] = (await db.execute(sql`select count(*)::int as total from leads l join contacts ct on ct.id = l.contact_id left join companies co on co.id = l.company_id where ${where}`)).rows as { total: number }[];
+    const [{ total }] = (await db.execute(sql`select count(*)::int as total from los_leads l join los_contacts ct on ct.id = l.contact_id left join los_companies co on co.id = l.company_id where ${where}`)).rows as { total: number }[];
     return { items: rows.rows, total, page: q.page, pageSize: q.pageSize };
   });
 
@@ -379,7 +379,7 @@ export async function leadRoutes(app: FastifyInstance) {
     const assignee = q.assignee && isManager(u) ? q.assignee : u.id;
     const rows = await db.execute(sql`
       select t.*, l.number as lead_number, ct.display_name as contact_name
-      from tasks t left join leads l on l.id = t.lead_id left join contacts ct on ct.id = l.contact_id
+      from los_tasks t left join los_leads l on l.id = t.lead_id left join los_contacts ct on ct.id = l.contact_id
       where t.assignee_id = ${assignee}::uuid ${q.open === "true" ? sql`and t.completed_at is null` : sql``}
       order by t.due_at asc nulls last limit 200`);
     return { items: rows.rows };
@@ -422,8 +422,8 @@ export async function leadRoutes(app: FastifyInstance) {
     const rows = await db.execute(sql`
       select l.id, l.number, l.stage, l.score, l.value_estimate, l.source, l.next_step, l.next_step_at, l.last_activity_at, l.owner_id,
              ct.display_name as contact_name, co.name as company_name, u.name as owner_name,
-             (select max(case when t.breached_at is not null then 2 when t.warned_at is not null then 1 else 0 end) from sla_timers t where t.lead_id = l.id and t.state = 'running') as sla_level
-      from leads l join contacts ct on ct.id = l.contact_id left join companies co on co.id = l.company_id left join users u on u.id = l.owner_id
+             (select max(case when t.breached_at is not null then 2 when t.warned_at is not null then 1 else 0 end) from los_sla_timers t where t.lead_id = l.id and t.state = 'running') as sla_level
+      from los_leads l join los_contacts ct on ct.id = l.contact_id left join los_companies co on co.id = l.company_id left join los_users u on u.id = l.owner_id
       where ${sql.join(conds, sql` and `)}
       order by l.score desc, l.last_activity_at desc limit 1000`);
     const columns = STAGES.map((stage) => {
@@ -437,20 +437,20 @@ export async function leadRoutes(app: FastifyInstance) {
   app.get("/api/my-day", async (req) => {
     const u = requireUser(req);
     const [overdue, today, slaRisk, unanswered, nextSteps] = await Promise.all([
-      db.execute(sql`select t.*, l.number as lead_number, ct.display_name as contact_name from tasks t left join leads l on l.id = t.lead_id left join contacts ct on ct.id = l.contact_id
+      db.execute(sql`select t.*, l.number as lead_number, ct.display_name as contact_name from los_tasks t left join los_leads l on l.id = t.lead_id left join los_contacts ct on ct.id = l.contact_id
         where t.assignee_id = ${u.id}::uuid and t.completed_at is null and t.due_at < date_trunc('day', now() at time zone 'Asia/Kolkata') at time zone 'Asia/Kolkata' order by t.due_at limit 100`),
-      db.execute(sql`select t.*, l.number as lead_number, ct.display_name as contact_name from tasks t left join leads l on l.id = t.lead_id left join contacts ct on ct.id = l.contact_id
+      db.execute(sql`select t.*, l.number as lead_number, ct.display_name as contact_name from los_tasks t left join los_leads l on l.id = t.lead_id left join los_contacts ct on ct.id = l.contact_id
         where t.assignee_id = ${u.id}::uuid and t.completed_at is null and t.due_at >= date_trunc('day', now() at time zone 'Asia/Kolkata') at time zone 'Asia/Kolkata'
           and t.due_at < (date_trunc('day', now() at time zone 'Asia/Kolkata') + interval '1 day') at time zone 'Asia/Kolkata' order by t.due_at limit 100`),
       db.execute(sql`select tm.kind, tm.breach_at, tm.warned_at, tm.breached_at, l.id as lead_id, l.number as lead_number, ct.display_name as contact_name,
-          (select c.id from conversations c where c.lead_id = l.id order by c.last_message_at desc nulls last limit 1) as conversation_id
-        from sla_timers tm join leads l on l.id = tm.lead_id join contacts ct on ct.id = l.contact_id
+          (select c.id from los_conversations c where c.lead_id = l.id order by c.last_message_at desc nulls last limit 1) as conversation_id
+        from los_sla_timers tm join los_leads l on l.id = tm.lead_id join los_contacts ct on ct.id = l.contact_id
         where tm.state = 'running' and (l.owner_id = ${u.id}::uuid ${isManager(u) ? sql`or true` : sql``}) and tm.breach_at < now() + interval '30 minutes' order by tm.breach_at limit 50`),
       db.execute(sql`select c.id as conversation_id, c.channel, c.last_message_at, c.last_message_preview, l.id as lead_id, l.number as lead_number, ct.display_name as contact_name
-        from conversations c join leads l on l.id = c.lead_id join contacts ct on ct.id = c.contact_id
+        from los_conversations c join los_leads l on l.id = c.lead_id join los_contacts ct on ct.id = c.contact_id
         where c.state = 'waiting_us' and not c.is_junk and l.owner_id = ${u.id}::uuid order by c.last_message_at asc limit 50`),
       db.execute(sql`select l.id as lead_id, l.number as lead_number, l.next_step, l.next_step_at, l.stage, ct.display_name as contact_name
-        from leads l join contacts ct on ct.id = l.contact_id
+        from los_leads l join los_contacts ct on ct.id = l.contact_id
         where l.owner_id = ${u.id}::uuid and l.closed_at is null and l.next_step_at < now() + interval '1 day' order by l.next_step_at limit 50`),
     ]);
     const missingNextStep = await db

@@ -166,9 +166,9 @@ export async function threadEmail(e: NormalizedEmail, contactEmail: string | nul
   const subj = normaliseSubject(e.subject);
   if (contactEmail && subj.length >= 4) {
     const rows = await db.execute(sql`
-      select c.lead_id from conversations c
-      join channel_identities ci on ci.contact_id = c.contact_id and ci.kind = 'email' and ci.value_normalised = ${contactEmail}
-      join leads l on l.id = c.lead_id and l.closed_at is null
+      select c.lead_id from los_conversations c
+      join los_channel_identities ci on ci.contact_id = c.contact_id and ci.kind = 'email' and ci.value_normalised = ${contactEmail}
+      join los_leads l on l.id = c.lead_id and l.closed_at is null
       where c.channel = 'email' and c.updated_at > now() - interval '30 days'
         and lower(regexp_replace(coalesce(c.subject, ''), '^((re|fwd?|aw)\\s*:\\s*)+', '', 'i')) = ${subj}
       order by c.updated_at desc limit 1`);

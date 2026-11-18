@@ -14,7 +14,7 @@ const migrationsFolder = resolve(dirname(fileURLToPath(import.meta.url)), "../mi
 export async function createTestDb(opts: { seed?: boolean } = {}): Promise<{ db: Db; client: PGlite }> {
   const client = new PGlite({ extensions: { pg_trgm } });
   const db = drizzle(client, { schema }) as unknown as Db;
-  await migrate(drizzle(client), { migrationsFolder });
+  await migrate(drizzle(client), { migrationsFolder, migrationsSchema: process.env.DB_SCHEMA || "public", migrationsTable: "los_drizzle_migrations" });
   if (opts.seed !== false) await seedBase(db);
   setDb(db);
   return { db, client };

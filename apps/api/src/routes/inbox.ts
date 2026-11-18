@@ -91,7 +91,7 @@ export async function inboxRoutes(app: FastifyInstance) {
         conds.push(sql`c.channel = 'whatsapp' and c.window_expires_at between now() and now() + interval '2 hours' and c.last_direction = 'inbound'`);
         break;
       case "sla":
-        conds.push(sql`exists (select 1 from sla_timers t where t.lead_id = l.id and t.state = 'running' and t.warned_at is not null)`);
+        conds.push(sql`exists (select 1 from los_sla_timers t where t.lead_id = l.id and t.state = 'running' and t.warned_at is not null)`);
         break;
       case "unread":
         conds.push(sql`c.unread_count > 0 and not c.is_junk`);
@@ -122,13 +122,13 @@ export async function inboxRoutes(app: FastifyInstance) {
              ct.display_name as contact_name, ct.id as contact_id, co.name as company_name,
              u.name as owner_name,
              (select max(case when t.breached_at is not null then 2 when t.warned_at is not null then 1 else 0 end)
-                from sla_timers t where t.lead_id = l.id and t.state = 'running') as sla_level,
-             (select min(t.breach_at) from sla_timers t where t.lead_id = l.id and t.state = 'running') as sla_due_at
-      from conversations c
-      join leads l on l.id = c.lead_id
-      join contacts ct on ct.id = c.contact_id
-      left join companies co on co.id = l.company_id
-      left join users u on u.id = l.owner_id
+                from los_sla_timers t where t.lead_id = l.id and t.state = 'running') as sla_level,
+             (select min(t.breach_at) from los_sla_timers t where t.lead_id = l.id and t.state = 'running') as sla_due_at
+      from los_conversations c
+      join los_leads l on l.id = c.lead_id
+      join los_contacts ct on ct.id = c.contact_id
+      left join los_companies co on co.id = l.company_id
+      left join los_users u on u.id = l.owner_id
       where ${sql.join(conds, sql` and `)}
       order by ${order}
       limit ${qs.limit}`);
@@ -139,7 +139,7 @@ export async function inboxRoutes(app: FastifyInstance) {
         count(*) filter (where c.state = 'waiting_us' and not c.is_junk)::int as awaiting,
         count(*) filter (where c.unread_count > 0 and not c.is_junk)::int as unread,
         count(*) filter (where c.channel = 'whatsapp' and c.window_expires_at between now() and now() + interval '2 hours' and c.last_direction = 'inbound')::int as window_closing
-      from conversations c join leads l on l.id = c.lead_id
+      from los_conversations c join los_leads l on l.id = c.lead_id
       where c.org_id = ${ORG_ID} ${isManager(u) ? sql`` : sql`and (l.owner_id = ${u.id}::uuid or l.owner_id is null)`}`);
     return { items: r.rows, counts: counts.rows[0] };
   });

@@ -1,11 +1,11 @@
 {
-  "id": "a8aaec1e-94a0-4d80-9ee4-bad262931ab9",
-  "prevId": "f87d701f-e62f-44dc-b49f-e0a189861055",
+  "id": "3e60958c-7e57-4834-9660-ebf10f0d75b9",
+  "prevId": "3f007df7-689c-483a-af8c-7cd400a32e76",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.activities": {
-      "name": "activities",
+    "public.los_activities": {
+      "name": "los_activities",
       "schema": "",
       "columns": {
         "id": {
@@ -62,8 +62,8 @@
         }
       },
       "indexes": {
-        "activities_lead_idx": {
-          "name": "activities_lead_idx",
+        "los_activities_lead_idx": {
+          "name": "los_activities_lead_idx",
           "columns": [
             {
               "expression": "lead_id",
@@ -83,8 +83,8 @@
           "method": "btree",
           "with": {}
         },
-        "activities_type_idx": {
-          "name": "activities_type_idx",
+        "los_activities_type_idx": {
+          "name": "los_activities_type_idx",
           "columns": [
             {
               "expression": "org_id",
@@ -118,8 +118,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.api_tokens": {
-      "name": "api_tokens",
+    "public.los_api_tokens": {
+      "name": "los_api_tokens",
       "schema": "",
       "columns": {
         "id": {
@@ -188,8 +188,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.attachments": {
-      "name": "attachments",
+    "public.los_attachments": {
+      "name": "los_attachments",
       "schema": "",
       "columns": {
         "id": {
@@ -275,8 +275,8 @@
         }
       },
       "indexes": {
-        "attachments_owner_idx": {
-          "name": "attachments_owner_idx",
+        "los_attachments_owner_idx": {
+          "name": "los_attachments_owner_idx",
           "columns": [
             {
               "expression": "owner_type",
@@ -304,8 +304,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.audit_log": {
-      "name": "audit_log",
+    "public.los_audit_log": {
+      "name": "los_audit_log",
       "schema": "",
       "columns": {
         "id": {
@@ -379,8 +379,8 @@
         }
       },
       "indexes": {
-        "audit_entity_idx": {
-          "name": "audit_entity_idx",
+        "los_audit_entity_idx": {
+          "name": "los_audit_entity_idx",
           "columns": [
             {
               "expression": "entity",
@@ -400,8 +400,8 @@
           "method": "btree",
           "with": {}
         },
-        "audit_at_idx": {
-          "name": "audit_at_idx",
+        "los_audit_at_idx": {
+          "name": "los_audit_at_idx",
           "columns": [
             {
               "expression": "at",
@@ -423,8 +423,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.broadcast_recipients": {
-      "name": "broadcast_recipients",
+    "public.los_broadcast_recipients": {
+      "name": "los_broadcast_recipients",
       "schema": "",
       "columns": {
         "id": {
@@ -473,8 +473,8 @@
         }
       },
       "indexes": {
-        "broadcast_recipient_uq": {
-          "name": "broadcast_recipient_uq",
+        "los_broadcast_recipient_uq": {
+          "name": "los_broadcast_recipient_uq",
           "columns": [
             {
               "expression": "broadcast_id",
@@ -502,8 +502,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.broadcasts": {
-      "name": "broadcasts",
+    "public.los_broadcasts": {
+      "name": "los_broadcasts",
       "schema": "",
       "columns": {
         "id": {
@@ -611,8 +611,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.business_hours": {
-      "name": "business_hours",
+    "public.los_business_hours": {
+      "name": "los_business_hours",
       "schema": "",
       "columns": {
         "id": {
@@ -663,8 +663,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.channel_identities": {
-      "name": "channel_identities",
+    "public.los_channel_identities": {
+      "name": "los_channel_identities",
       "schema": "",
       "columns": {
         "id": {
@@ -727,8 +727,8 @@
         }
       },
       "indexes": {
-        "channel_identities_uq": {
-          "name": "channel_identities_uq",
+        "los_channel_identities_uq": {
+          "name": "los_channel_identities_uq",
           "columns": [
             {
               "expression": "org_id",
@@ -754,8 +754,8 @@
           "method": "btree",
           "with": {}
         },
-        "channel_identities_contact_idx": {
-          "name": "channel_identities_contact_idx",
+        "los_channel_identities_contact_idx": {
+          "name": "los_channel_identities_contact_idx",
           "columns": [
             {
               "expression": "contact_id",
@@ -777,8 +777,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.companies": {
-      "name": "companies",
+    "public.los_companies": {
+      "name": "los_companies",
       "schema": "",
       "columns": {
         "id": {
@@ -876,8 +876,8 @@
         }
       },
       "indexes": {
-        "companies_org_domain_uq": {
-          "name": "companies_org_domain_uq",
+        "los_companies_org_domain_uq": {
+          "name": "los_companies_org_domain_uq",
           "columns": [
             {
               "expression": "org_id",
@@ -893,13 +893,13 @@
             }
           ],
           "isUnique": true,
-          "where": "\"companies\".\"domain\" is not null",
+          "where": "\"los_companies\".\"domain\" is not null",
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "companies_name_trgm": {
-          "name": "companies_name_trgm",
+        "los_companies_name_trgm": {
+          "name": "los_companies_name_trgm",
           "columns": [
             {
               "expression": "\"name\" gin_trgm_ops",
@@ -921,8 +921,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.consent_records": {
-      "name": "consent_records",
+    "public.los_consent_records": {
+      "name": "los_consent_records",
       "schema": "",
       "columns": {
         "id": {
@@ -1002,8 +1002,8 @@
         }
       },
       "indexes": {
-        "consent_contact_idx": {
-          "name": "consent_contact_idx",
+        "los_consent_contact_idx": {
+          "name": "los_consent_contact_idx",
           "columns": [
             {
               "expression": "contact_id",
@@ -1037,8 +1037,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.contacts": {
-      "name": "contacts",
+    "public.los_contacts": {
+      "name": "los_contacts",
       "schema": "",
       "columns": {
         "id": {
@@ -1157,8 +1157,8 @@
         }
       },
       "indexes": {
-        "contacts_company_idx": {
-          "name": "contacts_company_idx",
+        "los_contacts_company_idx": {
+          "name": "los_contacts_company_idx",
           "columns": [
             {
               "expression": "company_id",
@@ -1172,8 +1172,8 @@
           "method": "btree",
           "with": {}
         },
-        "contacts_name_trgm": {
-          "name": "contacts_name_trgm",
+        "los_contacts_name_trgm": {
+          "name": "los_contacts_name_trgm",
           "columns": [
             {
               "expression": "(coalesce(\"display_name\", '') || ' ' || coalesce(\"first_name\", '') || ' ' || coalesce(\"last_name\", '')) gin_trgm_ops",
@@ -1195,8 +1195,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.conversations": {
-      "name": "conversations",
+    "public.los_conversations": {
+      "name": "los_conversations",
       "schema": "",
       "columns": {
         "id": {
@@ -1351,8 +1351,8 @@
         }
       },
       "indexes": {
-        "conversations_lead_idx": {
-          "name": "conversations_lead_idx",
+        "los_conversations_lead_idx": {
+          "name": "los_conversations_lead_idx",
           "columns": [
             {
               "expression": "lead_id",
@@ -1366,8 +1366,8 @@
           "method": "btree",
           "with": {}
         },
-        "conversations_inbox_idx": {
-          "name": "conversations_inbox_idx",
+        "los_conversations_inbox_idx": {
+          "name": "los_conversations_inbox_idx",
           "columns": [
             {
               "expression": "org_id",
@@ -1393,8 +1393,8 @@
           "method": "btree",
           "with": {}
         },
-        "conversations_assigned_idx": {
-          "name": "conversations_assigned_idx",
+        "los_conversations_assigned_idx": {
+          "name": "los_conversations_assigned_idx",
           "columns": [
             {
               "expression": "assigned_to",
@@ -1414,8 +1414,8 @@
           "method": "btree",
           "with": {}
         },
-        "conversations_window_idx": {
-          "name": "conversations_window_idx",
+        "los_conversations_window_idx": {
+          "name": "los_conversations_window_idx",
           "columns": [
             {
               "expression": "window_expires_at",
@@ -1425,7 +1425,7 @@
             }
           ],
           "isUnique": false,
-          "where": "\"conversations\".\"window_expires_at\" is not null",
+          "where": "\"los_conversations\".\"window_expires_at\" is not null",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -1438,8 +1438,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.data_rights_requests": {
-      "name": "data_rights_requests",
+    "public.los_data_rights_requests": {
+      "name": "los_data_rights_requests",
       "schema": "",
       "columns": {
         "id": {
@@ -1532,8 +1532,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.duplicate_suggestions": {
-      "name": "duplicate_suggestions",
+    "public.los_duplicate_suggestions": {
+      "name": "los_duplicate_suggestions",
       "schema": "",
       "columns": {
         "id": {
@@ -1595,8 +1595,8 @@
         }
       },
       "indexes": {
-        "duplicate_pair_uq": {
-          "name": "duplicate_pair_uq",
+        "los_duplicate_pair_uq": {
+          "name": "los_duplicate_pair_uq",
           "columns": [
             {
               "expression": "contact_a",
@@ -1624,8 +1624,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.enrichment_results": {
-      "name": "enrichment_results",
+    "public.los_enrichment_results": {
+      "name": "los_enrichment_results",
       "schema": "",
       "columns": {
         "id": {
@@ -1688,8 +1688,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.enrollment_events": {
-      "name": "enrollment_events",
+    "public.los_enrollment_events": {
+      "name": "los_enrollment_events",
       "schema": "",
       "columns": {
         "id": {
@@ -1745,8 +1745,8 @@
         }
       },
       "indexes": {
-        "enrollment_events_enr_idx": {
-          "name": "enrollment_events_enr_idx",
+        "los_enrollment_events_enr_idx": {
+          "name": "los_enrollment_events_enr_idx",
           "columns": [
             {
               "expression": "enrollment_id",
@@ -1768,8 +1768,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.enrollments": {
-      "name": "enrollments",
+    "public.los_enrollments": {
+      "name": "los_enrollments",
       "schema": "",
       "columns": {
         "id": {
@@ -1844,8 +1844,8 @@
         }
       },
       "indexes": {
-        "enrollments_due_idx": {
-          "name": "enrollments_due_idx",
+        "los_enrollments_due_idx": {
+          "name": "los_enrollments_due_idx",
           "columns": [
             {
               "expression": "next_run_at",
@@ -1855,13 +1855,13 @@
             }
           ],
           "isUnique": false,
-          "where": "\"enrollments\".\"state\" = 'active'",
+          "where": "\"los_enrollments\".\"state\" = 'active'",
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "enrollments_active_uq": {
-          "name": "enrollments_active_uq",
+        "los_enrollments_active_uq": {
+          "name": "los_enrollments_active_uq",
           "columns": [
             {
               "expression": "lead_id",
@@ -1877,7 +1877,7 @@
             }
           ],
           "isUnique": true,
-          "where": "\"enrollments\".\"state\" = 'active'",
+          "where": "\"los_enrollments\".\"state\" = 'active'",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -1890,8 +1890,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.free_email_domains": {
-      "name": "free_email_domains",
+    "public.los_free_email_domains": {
+      "name": "los_free_email_domains",
       "schema": "",
       "columns": {
         "domain": {
@@ -1909,8 +1909,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.holidays": {
-      "name": "holidays",
+    "public.los_holidays": {
+      "name": "los_holidays",
       "schema": "",
       "columns": {
         "id": {
@@ -1946,8 +1946,8 @@
         }
       },
       "indexes": {
-        "holidays_org_day_idx": {
-          "name": "holidays_org_day_idx",
+        "los_holidays_org_day_idx": {
+          "name": "los_holidays_org_day_idx",
           "columns": [
             {
               "expression": "org_id",
@@ -1975,8 +1975,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.lead_sources": {
-      "name": "lead_sources",
+    "public.los_lead_sources": {
+      "name": "los_lead_sources",
       "schema": "",
       "columns": {
         "id": {
@@ -2013,8 +2013,8 @@
         }
       },
       "indexes": {
-        "lead_sources_key_uq": {
-          "name": "lead_sources_key_uq",
+        "los_lead_sources_key_uq": {
+          "name": "los_lead_sources_key_uq",
           "columns": [
             {
               "expression": "org_id",
@@ -2042,8 +2042,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.leads": {
-      "name": "leads",
+    "public.los_leads": {
+      "name": "los_leads",
       "schema": "",
       "columns": {
         "id": {
@@ -2302,8 +2302,8 @@
         }
       },
       "indexes": {
-        "leads_open_contact_idx": {
-          "name": "leads_open_contact_idx",
+        "los_leads_open_contact_idx": {
+          "name": "los_leads_open_contact_idx",
           "columns": [
             {
               "expression": "contact_id",
@@ -2313,13 +2313,13 @@
             }
           ],
           "isUnique": false,
-          "where": "\"leads\".\"closed_at\" is null",
+          "where": "\"los_leads\".\"closed_at\" is null",
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "leads_owner_stage_idx": {
-          "name": "leads_owner_stage_idx",
+        "los_leads_owner_stage_idx": {
+          "name": "los_leads_owner_stage_idx",
           "columns": [
             {
               "expression": "owner_id",
@@ -2339,8 +2339,8 @@
           "method": "btree",
           "with": {}
         },
-        "leads_stage_idx": {
-          "name": "leads_stage_idx",
+        "los_leads_stage_idx": {
+          "name": "los_leads_stage_idx",
           "columns": [
             {
               "expression": "org_id",
@@ -2360,8 +2360,8 @@
           "method": "btree",
           "with": {}
         },
-        "leads_created_idx": {
-          "name": "leads_created_idx",
+        "los_leads_created_idx": {
+          "name": "los_leads_created_idx",
           "columns": [
             {
               "expression": "org_id",
@@ -2381,8 +2381,8 @@
           "method": "btree",
           "with": {}
         },
-        "leads_portal_uq": {
-          "name": "leads_portal_uq",
+        "los_leads_portal_uq": {
+          "name": "los_leads_portal_uq",
           "columns": [
             {
               "expression": "org_id",
@@ -2404,7 +2404,7 @@
             }
           ],
           "isUnique": true,
-          "where": "\"leads\".\"portal_lead_id\" is not null",
+          "where": "\"los_leads\".\"portal_lead_id\" is not null",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -2417,8 +2417,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.lost_reasons": {
-      "name": "lost_reasons",
+    "public.los_lost_reasons": {
+      "name": "los_lost_reasons",
       "schema": "",
       "columns": {
         "id": {
@@ -2455,8 +2455,8 @@
         }
       },
       "indexes": {
-        "lost_reasons_key_uq": {
-          "name": "lost_reasons_key_uq",
+        "los_lost_reasons_key_uq": {
+          "name": "los_lost_reasons_key_uq",
           "columns": [
             {
               "expression": "org_id",
@@ -2484,8 +2484,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.mailbox_connections": {
-      "name": "mailbox_connections",
+    "public.los_mailbox_connections": {
+      "name": "los_mailbox_connections",
       "schema": "",
       "columns": {
         "id": {
@@ -2572,8 +2572,8 @@
         }
       },
       "indexes": {
-        "mailbox_connections_email_uq": {
-          "name": "mailbox_connections_email_uq",
+        "los_mailbox_connections_email_uq": {
+          "name": "los_mailbox_connections_email_uq",
           "columns": [
             {
               "expression": "email",
@@ -2595,8 +2595,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.messages": {
-      "name": "messages",
+    "public.los_messages": {
+      "name": "los_messages",
       "schema": "",
       "columns": {
         "id": {
@@ -2875,8 +2875,8 @@
         }
       },
       "indexes": {
-        "messages_provider_uq": {
-          "name": "messages_provider_uq",
+        "los_messages_provider_uq": {
+          "name": "los_messages_provider_uq",
           "columns": [
             {
               "expression": "channel",
@@ -2892,13 +2892,13 @@
             }
           ],
           "isUnique": true,
-          "where": "\"messages\".\"provider_message_id\" is not null",
+          "where": "\"los_messages\".\"provider_message_id\" is not null",
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "messages_idem_uq": {
-          "name": "messages_idem_uq",
+        "los_messages_idem_uq": {
+          "name": "los_messages_idem_uq",
           "columns": [
             {
               "expression": "idempotency_key",
@@ -2908,13 +2908,13 @@
             }
           ],
           "isUnique": true,
-          "where": "\"messages\".\"idempotency_key\" is not null",
+          "where": "\"los_messages\".\"idempotency_key\" is not null",
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "messages_conversation_idx": {
-          "name": "messages_conversation_idx",
+        "los_messages_conversation_idx": {
+          "name": "los_messages_conversation_idx",
           "columns": [
             {
               "expression": "conversation_id",
@@ -2934,8 +2934,8 @@
           "method": "btree",
           "with": {}
         },
-        "messages_email_mid_idx": {
-          "name": "messages_email_mid_idx",
+        "los_messages_email_mid_idx": {
+          "name": "los_messages_email_mid_idx",
           "columns": [
             {
               "expression": "email_message_id",
@@ -2945,13 +2945,13 @@
             }
           ],
           "isUnique": false,
-          "where": "\"messages\".\"email_message_id\" is not null",
+          "where": "\"los_messages\".\"email_message_id\" is not null",
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "messages_search_idx": {
-          "name": "messages_search_idx",
+        "los_messages_search_idx": {
+          "name": "los_messages_search_idx",
           "columns": [
             {
               "expression": "search",
@@ -2965,8 +2965,8 @@
           "method": "gin",
           "with": {}
         },
-        "messages_status_idx": {
-          "name": "messages_status_idx",
+        "los_messages_status_idx": {
+          "name": "los_messages_status_idx",
           "columns": [
             {
               "expression": "status",
@@ -2976,7 +2976,7 @@
             }
           ],
           "isUnique": false,
-          "where": "\"messages\".\"status\" in ('queued','sending')",
+          "where": "\"los_messages\".\"status\" in ('queued','sending')",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -2989,8 +2989,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.notes": {
-      "name": "notes",
+    "public.los_notes": {
+      "name": "los_notes",
       "schema": "",
       "columns": {
         "id": {
@@ -3056,8 +3056,8 @@
         }
       },
       "indexes": {
-        "notes_lead_idx": {
-          "name": "notes_lead_idx",
+        "los_notes_lead_idx": {
+          "name": "los_notes_lead_idx",
           "columns": [
             {
               "expression": "lead_id",
@@ -3071,8 +3071,8 @@
           "method": "btree",
           "with": {}
         },
-        "notes_search_idx": {
-          "name": "notes_search_idx",
+        "los_notes_search_idx": {
+          "name": "los_notes_search_idx",
           "columns": [
             {
               "expression": "search",
@@ -3094,8 +3094,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.notice_versions": {
-      "name": "notice_versions",
+    "public.los_notice_versions": {
+      "name": "los_notice_versions",
       "schema": "",
       "columns": {
         "id": {
@@ -3132,8 +3132,8 @@
         }
       },
       "indexes": {
-        "notice_versions_uq": {
-          "name": "notice_versions_uq",
+        "los_notice_versions_uq": {
+          "name": "los_notice_versions_uq",
           "columns": [
             {
               "expression": "org_id",
@@ -3161,8 +3161,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.notifications": {
-      "name": "notifications",
+    "public.los_notifications": {
+      "name": "los_notifications",
       "schema": "",
       "columns": {
         "id": {
@@ -3229,8 +3229,8 @@
         }
       },
       "indexes": {
-        "notifications_user_idx": {
-          "name": "notifications_user_idx",
+        "los_notifications_user_idx": {
+          "name": "los_notifications_user_idx",
           "columns": [
             {
               "expression": "user_id",
@@ -3258,8 +3258,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.orgs": {
-      "name": "orgs",
+    "public.los_orgs": {
+      "name": "los_orgs",
       "schema": "",
       "columns": {
         "id": {
@@ -3298,8 +3298,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.parse_failures": {
-      "name": "parse_failures",
+    "public.los_parse_failures": {
+      "name": "los_parse_failures",
       "schema": "",
       "columns": {
         "id": {
@@ -3373,8 +3373,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.rate_card": {
-      "name": "rate_card",
+    "public.los_rate_card": {
+      "name": "los_rate_card",
       "schema": "",
       "columns": {
         "id": {
@@ -3416,8 +3416,8 @@
         }
       },
       "indexes": {
-        "rate_card_uq": {
-          "name": "rate_card_uq",
+        "los_rate_card_uq": {
+          "name": "los_rate_card_uq",
           "columns": [
             {
               "expression": "country",
@@ -3451,8 +3451,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.routing_rules": {
-      "name": "routing_rules",
+    "public.los_routing_rules": {
+      "name": "los_routing_rules",
       "schema": "",
       "columns": {
         "id": {
@@ -3537,8 +3537,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sequence_steps": {
-      "name": "sequence_steps",
+    "public.los_sequence_steps": {
+      "name": "los_sequence_steps",
       "schema": "",
       "columns": {
         "id": {
@@ -3631,8 +3631,8 @@
         }
       },
       "indexes": {
-        "sequence_steps_pos_uq": {
-          "name": "sequence_steps_pos_uq",
+        "los_sequence_steps_pos_uq": {
+          "name": "los_sequence_steps_pos_uq",
           "columns": [
             {
               "expression": "sequence_id",
@@ -3660,8 +3660,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sequences": {
-      "name": "sequences",
+    "public.los_sequences": {
+      "name": "los_sequences",
       "schema": "",
       "columns": {
         "id": {
@@ -3720,8 +3720,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sessions": {
-      "name": "sessions",
+    "public.los_sessions": {
+      "name": "los_sessions",
       "schema": "",
       "columns": {
         "id": {
@@ -3770,8 +3770,8 @@
         }
       },
       "indexes": {
-        "sessions_user_idx": {
-          "name": "sessions_user_idx",
+        "los_sessions_user_idx": {
+          "name": "los_sessions_user_idx",
           "columns": [
             {
               "expression": "user_id",
@@ -3793,8 +3793,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sla_breaches": {
-      "name": "sla_breaches",
+    "public.los_sla_breaches": {
+      "name": "los_sla_breaches",
       "schema": "",
       "columns": {
         "id": {
@@ -3849,8 +3849,8 @@
         }
       },
       "indexes": {
-        "sla_breaches_uq": {
-          "name": "sla_breaches_uq",
+        "los_sla_breaches_uq": {
+          "name": "los_sla_breaches_uq",
           "columns": [
             {
               "expression": "timer_id",
@@ -3878,8 +3878,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sla_policies": {
-      "name": "sla_policies",
+    "public.los_sla_policies": {
+      "name": "los_sla_policies",
       "schema": "",
       "columns": {
         "id": {
@@ -3929,8 +3929,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.sla_timers": {
-      "name": "sla_timers",
+    "public.los_sla_timers": {
+      "name": "los_sla_timers",
       "schema": "",
       "columns": {
         "id": {
@@ -4045,8 +4045,8 @@
         }
       },
       "indexes": {
-        "sla_timers_running_idx": {
-          "name": "sla_timers_running_idx",
+        "los_sla_timers_running_idx": {
+          "name": "los_sla_timers_running_idx",
           "columns": [
             {
               "expression": "state",
@@ -4062,13 +4062,13 @@
             }
           ],
           "isUnique": false,
-          "where": "\"sla_timers\".\"state\" = 'running'",
+          "where": "\"los_sla_timers\".\"state\" = 'running'",
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "sla_timers_lead_idx": {
-          "name": "sla_timers_lead_idx",
+        "los_sla_timers_lead_idx": {
+          "name": "los_sla_timers_lead_idx",
           "columns": [
             {
               "expression": "lead_id",
@@ -4090,8 +4090,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.snippets": {
-      "name": "snippets",
+    "public.los_snippets": {
+      "name": "los_snippets",
       "schema": "",
       "columns": {
         "id": {
@@ -4160,8 +4160,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.tasks": {
-      "name": "tasks",
+    "public.los_tasks": {
+      "name": "los_tasks",
       "schema": "",
       "columns": {
         "id": {
@@ -4229,8 +4229,8 @@
         }
       },
       "indexes": {
-        "tasks_assignee_open_idx": {
-          "name": "tasks_assignee_open_idx",
+        "los_tasks_assignee_open_idx": {
+          "name": "los_tasks_assignee_open_idx",
           "columns": [
             {
               "expression": "assignee_id",
@@ -4246,13 +4246,13 @@
             }
           ],
           "isUnique": false,
-          "where": "\"tasks\".\"completed_at\" is null",
+          "where": "\"los_tasks\".\"completed_at\" is null",
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "tasks_lead_idx": {
-          "name": "tasks_lead_idx",
+        "los_tasks_lead_idx": {
+          "name": "los_tasks_lead_idx",
           "columns": [
             {
               "expression": "lead_id",
@@ -4274,8 +4274,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.teams": {
-      "name": "teams",
+    "public.los_teams": {
+      "name": "los_teams",
       "schema": "",
       "columns": {
         "id": {
@@ -4319,8 +4319,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.templates": {
-      "name": "templates",
+    "public.los_templates": {
+      "name": "los_templates",
       "schema": "",
       "columns": {
         "id": {
@@ -4454,8 +4454,8 @@
         }
       },
       "indexes": {
-        "templates_provider_uq": {
-          "name": "templates_provider_uq",
+        "los_templates_provider_uq": {
+          "name": "los_templates_provider_uq",
           "columns": [
             {
               "expression": "org_id",
@@ -4495,8 +4495,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users": {
-      "name": "users",
+    "public.los_users": {
+      "name": "los_users",
       "schema": "",
       "columns": {
         "id": {
@@ -4632,8 +4632,8 @@
         }
       },
       "indexes": {
-        "users_email_uq": {
-          "name": "users_email_uq",
+        "los_users_email_uq": {
+          "name": "los_users_email_uq",
           "columns": [
             {
               "expression": "email",
@@ -4655,8 +4655,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.wa_numbers": {
-      "name": "wa_numbers",
+    "public.los_wa_numbers": {
+      "name": "los_wa_numbers",
       "schema": "",
       "columns": {
         "id": {
@@ -4717,8 +4717,8 @@
         }
       },
       "indexes": {
-        "wa_numbers_pnid_uq": {
-          "name": "wa_numbers_pnid_uq",
+        "los_wa_numbers_pnid_uq": {
+          "name": "los_wa_numbers_pnid_uq",
           "columns": [
             {
               "expression": "phone_number_id",
@@ -4740,8 +4740,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.webhook_events": {
-      "name": "webhook_events",
+    "public.los_webhook_events": {
+      "name": "los_webhook_events",
       "schema": "",
       "columns": {
         "id": {
@@ -4810,8 +4810,8 @@
         }
       },
       "indexes": {
-        "webhook_events_uq": {
-          "name": "webhook_events_uq",
+        "los_webhook_events_uq": {
+          "name": "los_webhook_events_uq",
           "columns": [
             {
               "expression": "provider",
@@ -4831,8 +4831,8 @@
           "method": "btree",
           "with": {}
         },
-        "webhook_events_unprocessed_idx": {
-          "name": "webhook_events_unprocessed_idx",
+        "los_webhook_events_unprocessed_idx": {
+          "name": "los_webhook_events_unprocessed_idx",
           "columns": [
             {
               "expression": "received_at",
@@ -4842,7 +4842,7 @@
             }
           ],
           "isUnique": false,
-          "where": "\"webhook_events\".\"processed_at\" is null",
+          "where": "\"los_webhook_events\".\"processed_at\" is null",
           "concurrently": false,
           "method": "btree",
           "with": {}

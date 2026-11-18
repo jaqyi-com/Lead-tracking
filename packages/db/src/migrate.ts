@@ -6,6 +6,6 @@ import { getPool, closeDb } from "./client";
 
 const migrationsFolder = resolve(dirname(fileURLToPath(import.meta.url)), "../migrations");
 
-await migrate(drizzle(getPool()), { migrationsFolder });
+await migrate(drizzle(getPool()), { migrationsFolder, migrationsSchema: process.env.DB_SCHEMA || "public", migrationsTable: "los_drizzle_migrations" });
 console.log("migrations applied");
 await closeDb();
